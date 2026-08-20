@@ -1,4 +1,4 @@
-const CACHE_NAME = "vialix-key-v3";
+const CACHE_NAME = "vialix-key-v4";
 const ASSETS = [
   "./",
   "./index.html",
@@ -7,7 +7,9 @@ const ASSETS = [
   "./config.js",
   "./manifest.json",
   "./icon-192.png",
-  "./icon-512.png"
+  "./icon-512.png",
+  "./logo-vialix.png",
+  "./logo-arl-bolivar.png"
 ];
 
 self.addEventListener("install", (event) => {

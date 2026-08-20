@@ -40,6 +40,12 @@ const VIALIX_CONFIG = {
       url: "https://forms.office.com/r/hdbmkQfkh9"
     },
     {
+      id: "vehiculo_pesado",
+      nombre: "Vehículo pesado",
+      icono: "🚛",
+      url: "https://forms.cloud.microsoft/r/YEN6JbFYhm"
+    },
+    {
       id: "no_automotor",
       nombre: "No automotor / VELMPU",
       icono: "🚲",

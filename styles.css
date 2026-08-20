@@ -51,6 +51,24 @@ body {
   font-size: 0.85rem;
 }
 
+.brand-bar {
+  background: var(--blanco);
+  border-bottom: 1px solid var(--gris-claro);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.brand-logo { height: 34px; width: auto; object-fit: contain; }
+.brand-logo-arl { height: 30px; }
+.brand-separador {
+  width: 1px;
+  height: 28px;
+  background: var(--gris-claro);
+}
+
 #app {
   max-width: 520px;
   margin: 0 auto;
