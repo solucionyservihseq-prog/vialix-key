@@ -138,7 +138,6 @@ p { line-height: 1.45; color: #555; }
 .home-card { text-align: left; }
 .etiqueta { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #888; margin: 0; }
 .valor { font-size: 1.2rem; font-weight: 800; color: var(--verde-oscuro); margin: 2px 0 10px; }
-.home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
 
 .btn-accion {
   display: flex;
@@ -210,55 +209,29 @@ p { line-height: 1.45; color: #555; }
 }
 .respiracion-contador { font-size: 1.6rem; margin-top: 4px; }
 
-/* Checklist */
+/* Panel de categorías */
 .checklist-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 4px 4px 10px;
 }
-.checklist-progreso {
-  background: var(--verde);
-  color: white;
-  border-radius: 20px;
-  padding: 4px 12px;
+.categorias-ayuda { padding: 0 4px; margin-top: 0; }
+.categorias-lista { display: flex; flex-direction: column; gap: 12px; margin: 16px 0; }
+.categoria-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: white;
+  border-radius: var(--radio);
+  padding: 18px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  text-decoration: none;
+  color: var(--gris-texto);
+  font-size: 1.05rem;
   font-weight: 700;
-  font-size: 0.85rem;
 }
-.checklist-lista { display: flex; flex-direction: column; gap: 10px; margin-bottom: 90px; }
-
-.check-item {
-  background: white;
-  border-radius: 12px;
-  padding: 14px;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.05);
-}
-.check-item-texto { display: flex; flex-direction: column; margin-bottom: 10px; }
-.check-item-cat { font-size: 0.7rem; text-transform: uppercase; color: #999; font-weight: 700; letter-spacing: 0.4px; }
-.check-item-botones { display: flex; gap: 10px; }
-.check-item-botones button {
-  flex: 1;
-  border: 2px solid var(--gris-claro);
-  background: white;
-  border-radius: 10px;
-  padding: 10px;
-  font-size: 1.2rem;
-  font-weight: 800;
-  cursor: pointer;
-  color: #999;
-}
-.btn-ok.selected { background: #E4F5EC; border-color: var(--verde); color: var(--verde); }
-.btn-fallo.selected { background: #FCE9E9; border-color: var(--rojo); color: var(--rojo); }
-
-.check-item-nota { margin-top: 10px; }
-.check-item-nota textarea {
-  width: 100%;
-  min-height: 60px;
-  border: 1px solid var(--gris-claro);
-  border-radius: 8px;
-  padding: 8px;
-  font-family: inherit;
-}
+.categoria-icono { font-size: 1.6rem; }
 
 .file-btn {
   display: inline-block;
@@ -271,16 +244,6 @@ p { line-height: 1.45; color: #555; }
   cursor: pointer;
 }
 .file-btn input { display: none; }
-
-.btn-flotante {
-  position: fixed;
-  bottom: 16px;
-  left: 16px;
-  right: 16px;
-  max-width: 488px;
-  margin: 0 auto;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-}
 
 /* Resultado */
 .resultado-icono {

@@ -19,30 +19,10 @@
 
 <main id="app">
 
-  <!-- Sin placa detectada (acceso directo sin escanear NFC) -->
-  <section id="view-sin-placa" class="view">
-    <div class="card">
-      <h1>Bienvenido a VIALIX KEY</h1>
-      <p>No detectamos un vehículo asociado. Escanea el llavero NFC de tu vehículo con tu celular, o ingresa la placa manualmente para esta sesión.</p>
-      <label class="campo">
-        Placa del vehículo
-        <input type="text" id="input-placa-manual" placeholder="Ej: ABC123" style="text-transform:uppercase">
-      </label>
-      <button type="button" class="btn-primario" onclick="
-        const p = document.getElementById('input-placa-manual').value.trim().toUpperCase();
-        if(p){ state.placa = p; localStorage.setItem('vialix_placa', p);
-          const cond = localStorage.getItem('vialix_conductor');
-          if(cond){ state.conductor = cond; irAHome(); }
-          else { document.getElementById('placa-detectada').textContent = p; showView('view-conductor'); }
-        } else { alert('Escribe una placa válida'); }
-      ">Continuar</button>
-    </div>
-  </section>
-
-  <!-- Identificación del conductor -->
+  <!-- Identificación del conductor (primera vez) -->
   <section id="view-conductor" class="view">
     <div class="card">
-      <h1>Vehículo <span id="placa-detectada">--</span></h1>
+      <h1>Bienvenido a VIALIX KEY</h1>
       <p>¿Quién va a conducir hoy?</p>
       <label class="campo">
         Nombre del conductor
@@ -57,16 +37,8 @@
     <div class="card home-card">
       <p class="etiqueta">Cliente / piloto</p>
       <p class="valor" id="home-cliente">--</p>
-      <div class="home-grid">
-        <div>
-          <p class="etiqueta">Vehículo</p>
-          <p class="valor" id="home-placa">--</p>
-        </div>
-        <div>
-          <p class="etiqueta">Conductor</p>
-          <p class="valor" id="home-conductor">--</p>
-        </div>
-      </div>
+      <p class="etiqueta">Conductor</p>
+      <p class="valor" id="home-conductor">--</p>
       <button type="button" id="btn-cambiar-conductor" class="btn-link">Cambiar conductor</button>
     </div>
 
@@ -112,14 +84,14 @@
     </div>
   </section>
 
-  <!-- Checklist preoperacional -->
-  <section id="view-checklist" class="view">
+  <!-- Panel de categorías de chequeo -->
+  <section id="view-categorias" class="view">
     <div class="checklist-header">
-      <h1>Chequeo preoperacional</h1>
-      <span id="checklist-progreso" class="checklist-progreso">0 / 0</span>
+      <h1>¿Qué vas a chequear hoy?</h1>
     </div>
-    <div id="checklist-lista" class="checklist-lista"></div>
-    <button type="button" id="btn-finalizar-checklist" class="btn-primario btn-flotante" disabled>Finalizar chequeo</button>
+    <p class="categorias-ayuda">Elige el tipo de vehículo. Se abrirá el formulario de chequeo en una pestaña nueva.</p>
+    <div id="categorias-lista" class="categorias-lista"></div>
+    <button type="button" id="btn-volver-home-categorias" class="btn-link">← Volver al inicio</button>
   </section>
 
   <!-- Enviando -->
@@ -130,16 +102,14 @@
     </div>
   </section>
 
-  <!-- Resultado del chequeo -->
-  <section id="view-resultado" class="view">
-    <div class="card centrado" id="resultado-contenido"></div>
-    <button type="button" id="btn-volver-home-resultado" class="btn-primario">Volver al inicio</button>
-  </section>
-
   <!-- Novedad libre -->
   <section id="view-novedad" class="view">
     <div class="card">
       <h1>Reportar novedad</h1>
+      <label class="campo">
+        Placa del vehículo (opcional)
+        <input type="text" id="novedad-placa" placeholder="Ej: ABC123" style="text-transform:uppercase">
+      </label>
       <label class="campo">
         Descripción de la novedad
         <textarea id="novedad-descripcion" placeholder="Describe lo que observaste…"></textarea>

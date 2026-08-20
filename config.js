@@ -21,26 +21,30 @@ const VIALIX_CONFIG = {
   // Duración sugerida del ejercicio de respiración (segundos)
   DURACION_ENFOQUE_MENTAL: 45,
 
-  // Checklist de chequeo preoperacional (Resolución 40595 de 2022 / PESV)
-  // Puedes agregar, quitar o renombrar ítems libremente.
-  CHECKLIST: [
-    { id: "llantas", categoria: "Llantas y rines", texto: "Llantas (incluida la de repuesto), rines y presión en buen estado" },
-    { id: "frenos", categoria: "Frenos", texto: "Freno de pedal y freno de mano responden correctamente" },
-    { id: "luces", categoria: "Luces", texto: "Altas, bajas, direccionales, freno, reversa y parqueo funcionan" },
-    { id: "espejos", categoria: "Visibilidad", texto: "Espejos retrovisores completos y bien ajustados" },
-    { id: "cinturones", categoria: "Seguridad", texto: "Cinturones de seguridad en buen estado y funcionales" },
-    { id: "pito", categoria: "Seguridad", texto: "Pito / bocina funciona" },
-    { id: "limpiaparabrisas", categoria: "Visibilidad", texto: "Limpiaparabrisas y nivel de agua del limpiabrisas correctos" },
-    { id: "aceite", categoria: "Niveles", texto: "Nivel de aceite de motor correcto" },
-    { id: "liquido_frenos", categoria: "Niveles", texto: "Nivel de líquido de frenos correcto" },
-    { id: "refrigerante", categoria: "Niveles", texto: "Nivel de refrigerante correcto" },
-    { id: "bateria", categoria: "Mecánico", texto: "Batería con bornes limpios y bien sujeta" },
-    { id: "extintor", categoria: "Elementos de emergencia", texto: "Extintor presente y con carga vigente" },
-    { id: "botiquin", categoria: "Elementos de emergencia", texto: "Botiquín de primeros auxilios completo" },
-    { id: "kit_carretera", categoria: "Elementos de emergencia", texto: "Kit de carretera: tacos, señales/reflectivos y llave de pernos" },
-    { id: "documentos", categoria: "Documentos", texto: "SOAT, tecnomecánica, licencia de tránsito y de conducción vigentes" },
-    { id: "carroceria", categoria: "Estado general", texto: "Carrocería, puertas y vidrios sin daños que afecten la operación" },
-    { id: "fugas", categoria: "Mecánico", texto: "Sin fugas visibles de líquidos debajo del vehículo" }
+  // Categorías de chequeo preoperacional. Al tocar "Iniciar chequeo",
+  // el conductor ve este panel y elige su tipo de vehículo; cada opción
+  // lo lleva al formulario que la empresa ya usa para esa categoría.
+  // Agrega, quita o edita categorías libremente — así se adapta a
+  // cualquier empresa sin tocar el resto del código.
+  CATEGORIAS_CHEQUEO: [
+    {
+      id: "motocicleta",
+      nombre: "Motocicleta",
+      icono: "🏍️",
+      url: "https://forms.office.com/r/bX7FB1MBLV"
+    },
+    {
+      id: "vehiculo",
+      nombre: "Vehículo",
+      icono: "🚗",
+      url: "https://forms.office.com/r/hdbmkQfkh9"
+    },
+    {
+      id: "no_automotor",
+      nombre: "No automotor / VELMPU",
+      icono: "🚲",
+      url: "https://forms.office.com/r/BwuVTi0VW8"
+    }
   ],
 
   // Tips cortos de micro-formación en seguridad vial (rotan aleatoriamente)

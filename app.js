@@ -4,16 +4,11 @@
 
 const STORAGE_KEYS = {
   CONDUCTOR: "vialix_conductor",
-  PLACA: "vialix_placa",
   QUEUE: "vialix_queue_pendiente"
 };
 
 const state = {
-  placa: null,
-  conductor: null,
-  checklistRespuestas: {}, // { itemId: 'ok' | 'fallo' }
-  novedadesChecklist: {},  // { itemId: { descripcion, foto } }
-  inicioChequeo: null
+  conductor: null
 };
 
 /* ---------- Utilidades ---------- */
@@ -25,10 +20,6 @@ function showView(id) {
   $all(".view").forEach(v => v.classList.remove("active"));
   $(`#${id}`).classList.add("active");
   window.scrollTo(0, 0);
-}
-
-function getUrlParam(name) {
-  return new URLSearchParams(window.location.search).get(name);
 }
 
 function nowISO() {
@@ -128,28 +119,15 @@ function actualizarBadgeCola() {
   }
 }
 
-/* ---------- Identificación del vehículo ---------- */
+/* ---------- Identificación del conductor ---------- */
 
 function initIdentificacion() {
-  const vParam = getUrlParam("v");
   const conductorGuardado = localStorage.getItem(STORAGE_KEYS.CONDUCTOR);
-
-  if (vParam) {
-    state.placa = vParam.toUpperCase();
-    localStorage.setItem(STORAGE_KEYS.PLACA, state.placa);
-  } else {
-    state.placa = localStorage.getItem(STORAGE_KEYS.PLACA);
-  }
-
-  if (conductorGuardado) state.conductor = conductorGuardado;
-
-  if (state.placa && state.conductor) {
+  if (conductorGuardado) {
+    state.conductor = conductorGuardado;
     irAHome();
-  } else if (state.placa && !state.conductor) {
-    $("#placa-detectada").textContent = state.placa;
-    showView("view-conductor");
   } else {
-    showView("view-sin-placa");
+    showView("view-conductor");
   }
 }
 
@@ -167,14 +145,12 @@ function guardarConductor() {
 function cambiarConductor() {
   localStorage.removeItem(STORAGE_KEYS.CONDUCTOR);
   state.conductor = null;
-  $("#placa-detectada").textContent = state.placa || "(sin identificar)";
   showView("view-conductor");
 }
 
 /* ---------- Home ---------- */
 
 function irAHome() {
-  $("#home-placa").textContent = state.placa;
   $("#home-conductor").textContent = state.conductor;
   $("#home-cliente").textContent = VIALIX_CONFIG.NOMBRE_CLIENTE;
   actualizarBadgeCola();
@@ -217,7 +193,7 @@ function iniciarEnfoqueMental() {
 
     if (segundosRestantes <= 0) {
       clearInterval(focoInterval);
-      irAChecklist();
+      irACategorias();
     }
   }, 1000);
 
@@ -226,149 +202,37 @@ function iniciarEnfoqueMental() {
 
 function saltarEnfoqueMental() {
   clearInterval(focoInterval);
-  irAChecklist();
+  irACategorias();
 }
 
-/* ---------- Checklist preoperacional ---------- */
+/* ---------- Panel de categorías de chequeo ---------- */
 
-function irAChecklist() {
-  state.checklistRespuestas = {};
-  state.novedadesChecklist = {};
-  state.inicioChequeo = Date.now();
-  renderChecklist();
-  showView("view-checklist");
+function irACategorias() {
+  renderCategorias();
+  showView("view-categorias");
 }
 
-function renderChecklist() {
-  const cont = $("#checklist-lista");
+function renderCategorias() {
+  const cont = $("#categorias-lista");
   cont.innerHTML = "";
-  VIALIX_CONFIG.CHECKLIST.forEach((item) => {
-    const row = document.createElement("div");
-    row.className = "check-item";
-    row.innerHTML = `
-      <div class="check-item-texto">
-        <span class="check-item-cat">${item.categoria}</span>
-        <span>${item.texto}</span>
-      </div>
-      <div class="check-item-botones">
-        <button type="button" class="btn-ok" data-id="${item.id}" data-val="ok" aria-label="Correcto">✓</button>
-        <button type="button" class="btn-fallo" data-id="${item.id}" data-val="fallo" aria-label="Falla">✕</button>
-      </div>
-      <div class="check-item-nota hidden" id="nota-${item.id}">
-        <textarea placeholder="Describe la falla encontrada…" id="nota-texto-${item.id}"></textarea>
-        <label class="file-btn">
-          📷 Adjuntar foto
-          <input type="file" accept="image/*" capture="environment" id="nota-foto-${item.id}">
-        </label>
-      </div>
+  VIALIX_CONFIG.CATEGORIAS_CHEQUEO.forEach((cat) => {
+    const link = document.createElement("a");
+    link.className = "categoria-item";
+    link.href = cat.url;
+    link.target = "_blank";
+    link.rel = "noopener";
+    link.innerHTML = `
+      <span class="categoria-icono">${cat.icono || "🚙"}</span>
+      <span>${cat.nombre}</span>
     `;
-    cont.appendChild(row);
+    cont.appendChild(link);
   });
-
-  cont.addEventListener("click", onChecklistClick);
-  actualizarProgresoChecklist();
-}
-
-function onChecklistClick(e) {
-  const btn = e.target.closest("button[data-id]");
-  if (!btn) return;
-  const id = btn.dataset.id;
-  const val = btn.dataset.val;
-  state.checklistRespuestas[id] = val;
-
-  const fila = btn.closest(".check-item");
-  fila.querySelectorAll(".check-item-botones button").forEach(b => b.classList.remove("selected"));
-  btn.classList.add("selected");
-
-  const nota = $(`#nota-${id}`);
-  if (val === "fallo") {
-    nota.classList.remove("hidden");
-  } else {
-    nota.classList.add("hidden");
-    delete state.novedadesChecklist[id];
-  }
-  actualizarProgresoChecklist();
-}
-
-function actualizarProgresoChecklist() {
-  const total = VIALIX_CONFIG.CHECKLIST.length;
-  const respondidos = Object.keys(state.checklistRespuestas).length;
-  $("#checklist-progreso").textContent = `${respondidos} / ${total}`;
-  $("#btn-finalizar-checklist").disabled = respondidos < total;
-}
-
-async function finalizarChecklist() {
-  const total = VIALIX_CONFIG.CHECKLIST.length;
-  const respondidos = Object.keys(state.checklistRespuestas).length;
-  if (respondidos < total) {
-    alert("Debes revisar todos los ítems antes de finalizar.");
-    return;
-  }
-
-  // Recolectar notas de fallas
-  VIALIX_CONFIG.CHECKLIST.forEach((item) => {
-    if (state.checklistRespuestas[item.id] === "fallo") {
-      const textoEl = $(`#nota-texto-${item.id}`);
-      state.novedadesChecklist[item.id] = {
-        descripcion: textoEl ? textoEl.value.trim() : ""
-      };
-    }
-  });
-
-  const fallos = Object.entries(state.checklistRespuestas).filter(([, v]) => v === "fallo").map(([k]) => k);
-  const apto = fallos.length === 0;
-
-  showView("view-enviando");
-
-  const geo = await getGeo();
-  const duracion = Math.round((Date.now() - state.inicioChequeo) / 1000);
-
-  const payload = {
-    tipo: "inspeccion",
-    timestamp: nowISO(),
-    placa: state.placa,
-    conductor: state.conductor,
-    resultado: apto ? "APTO" : "NO APTO",
-    items_fallidos: fallos,
-    detalle: state.checklistRespuestas,
-    notas_fallas: state.novedadesChecklist,
-    duracion_seg: duracion,
-    lat: geo ? geo.lat : "",
-    lng: geo ? geo.lng : ""
-  };
-
-  await sendToBackend(payload);
-
-  mostrarResultadoChecklist(apto, fallos);
-}
-
-function mostrarResultadoChecklist(apto, fallos) {
-  const cont = $("#resultado-contenido");
-  if (apto) {
-    cont.innerHTML = `
-      <div class="resultado-icono ok">✓</div>
-      <h2>Vehículo APTO para operar</h2>
-      <p>Chequeo preoperacional completo. Conduce con precaución.</p>
-    `;
-  } else {
-    const items = fallos.map(id => {
-      const item = VIALIX_CONFIG.CHECKLIST.find(i => i.id === id);
-      return `<li>${item ? item.texto : id}</li>`;
-    }).join("");
-    cont.innerHTML = `
-      <div class="resultado-icono fallo">⚠</div>
-      <h2>Vehículo NO APTO</h2>
-      <p>Se detectaron las siguientes fallas. Reporta esto a tu líder SST antes de operar:</p>
-      <ul class="resultado-lista">${items}</ul>
-    `;
-  }
-  actualizarBadgeCola();
-  showView("view-resultado");
 }
 
 /* ---------- Reporte de novedad independiente ---------- */
 
 async function enviarNovedadLibre() {
+  const placa = $("#novedad-placa").value.trim().toUpperCase();
   const descripcion = $("#novedad-descripcion").value.trim();
   const severidad = $("#novedad-severidad").value;
   const fotoInput = $("#novedad-foto");
@@ -389,7 +253,7 @@ async function enviarNovedadLibre() {
   const payload = {
     tipo: "novedad",
     timestamp: nowISO(),
-    placa: state.placa,
+    placa: placa,
     conductor: state.conductor,
     item: "reporte_libre",
     descripcion,
@@ -400,6 +264,7 @@ async function enviarNovedadLibre() {
   };
 
   await sendToBackend(payload);
+  $("#novedad-placa").value = "";
   $("#novedad-descripcion").value = "";
   fotoInput.value = "";
   actualizarBadgeCola();
@@ -440,7 +305,6 @@ async function enviarAlertaPanico() {
   const payload = {
     tipo: "panico",
     timestamp: nowISO(),
-    placa: state.placa || "SIN_IDENTIFICAR",
     conductor: state.conductor || "SIN_IDENTIFICAR",
     lat: geo ? geo.lat : "",
     lng: geo ? geo.lng : ""
@@ -469,7 +333,6 @@ async function confirmarFormacion() {
   const payload = {
     tipo: "formacion",
     timestamp: nowISO(),
-    placa: state.placa,
     conductor: state.conductor,
     tip_id: idx,
     tip_texto: VIALIX_CONFIG.MICRO_FORMACION[idx]
@@ -491,8 +354,7 @@ document.addEventListener("DOMContentLoaded", () => {
   $("#btn-iniciar-chequeo").addEventListener("click", iniciarEnfoqueMental);
   $("#btn-saltar-enfoque").addEventListener("click", saltarEnfoqueMental);
 
-  $("#btn-finalizar-checklist").addEventListener("click", finalizarChecklist);
-  $("#btn-volver-home-resultado").addEventListener("click", irAHome);
+  $("#btn-volver-home-categorias").addEventListener("click", irAHome);
 
   $("#btn-reportar-novedad").addEventListener("click", () => showView("view-novedad"));
   $("#btn-enviar-novedad").addEventListener("click", enviarNovedadLibre);
