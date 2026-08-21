@@ -436,6 +436,19 @@ document.addEventListener("DOMContentLoaded", () => {
   reintentarCola();
 
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js").catch(console.warn);
+    navigator.serviceWorker.register("sw.js").then((reg) => {
+      // Cada vez que se abre la app, obliga a revisar si hay una versión
+      // nueva en el servidor (por defecto los navegadores pueden tardar
+      // horas en revisar por su cuenta, y eso dejaría a los conductores
+      // usando una versión vieja sin darse cuenta).
+      reg.update();
+    }).catch(console.warn);
+
+    let recargando = false;
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (recargando) return;
+      recargando = true;
+      window.location.reload();
+    });
   }
 });
