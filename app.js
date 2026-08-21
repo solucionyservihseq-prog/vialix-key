@@ -4,11 +4,13 @@
 
 const STORAGE_KEYS = {
   CONDUCTOR: "vialix_conductor",
+  IDENTIFICACION: "vialix_identificacion",
   QUEUE: "vialix_queue_pendiente"
 };
 
 const state = {
-  conductor: null
+  conductor: null,
+  identificacion: null
 };
 
 /* ---------- Utilidades ---------- */
@@ -123,28 +125,37 @@ function actualizarBadgeCola() {
 
 function initIdentificacion() {
   const conductorGuardado = localStorage.getItem(STORAGE_KEYS.CONDUCTOR);
-  if (conductorGuardado) {
+  const identificacionGuardada = localStorage.getItem(STORAGE_KEYS.IDENTIFICACION);
+  if (conductorGuardado && identificacionGuardada) {
     state.conductor = conductorGuardado;
+    state.identificacion = identificacionGuardada;
     irAHome();
   } else {
+    if (conductorGuardado) $("#input-conductor").value = conductorGuardado;
     showView("view-conductor");
   }
 }
 
 function guardarConductor() {
   const nombre = $("#input-conductor").value.trim();
-  if (!nombre) {
-    alert("Por favor escribe tu nombre para continuar.");
+  const identificacion = $("#input-identificacion").value.trim();
+  if (!nombre || !identificacion) {
+    alert("Por favor escribe tu nombre y tu número de identificación para continuar.");
     return;
   }
   state.conductor = nombre;
+  state.identificacion = identificacion;
   localStorage.setItem(STORAGE_KEYS.CONDUCTOR, nombre);
+  localStorage.setItem(STORAGE_KEYS.IDENTIFICACION, identificacion);
   irAHome();
 }
 
 function cambiarConductor() {
   localStorage.removeItem(STORAGE_KEYS.CONDUCTOR);
+  localStorage.removeItem(STORAGE_KEYS.IDENTIFICACION);
   state.conductor = null;
+  state.identificacion = null;
+  $("#input-identificacion").value = "";
   showView("view-conductor");
 }
 
@@ -152,6 +163,7 @@ function cambiarConductor() {
 
 function irAHome() {
   $("#home-conductor").textContent = state.conductor;
+  $("#home-identificacion").textContent = state.identificacion;
   $("#home-cliente").textContent = VIALIX_CONFIG.NOMBRE_CLIENTE;
   actualizarBadgeCola();
   showView("view-home");
@@ -255,6 +267,7 @@ async function enviarNovedadLibre() {
     timestamp: nowISO(),
     placa: placa,
     conductor: state.conductor,
+    identificacion: state.identificacion,
     item: "reporte_libre",
     descripcion,
     severidad,
@@ -306,6 +319,7 @@ async function registrarRecorrido(tipo, boton) {
     timestamp: nowISO(),
     placa: placa,
     conductor: state.conductor,
+    identificacion: state.identificacion,
     lat: geo ? geo.lat : "",
     lng: geo ? geo.lng : ""
   };
@@ -347,6 +361,7 @@ async function enviarAlertaPanico() {
     tipo: "panico",
     timestamp: nowISO(),
     conductor: state.conductor || "SIN_IDENTIFICAR",
+    identificacion: state.identificacion || "",
     lat: geo ? geo.lat : "",
     lng: geo ? geo.lng : ""
   };
@@ -375,6 +390,7 @@ async function confirmarFormacion() {
     tipo: "formacion",
     timestamp: nowISO(),
     conductor: state.conductor,
+    identificacion: state.identificacion,
     tip_id: idx,
     tip_texto: VIALIX_CONFIG.MICRO_FORMACION[idx]
   };
