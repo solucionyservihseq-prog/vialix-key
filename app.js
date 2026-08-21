@@ -280,6 +280,47 @@ function fileToBase64(file) {
   });
 }
 
+/* ---------- Registro de recorrido ---------- */
+
+const RECORRIDO_LABELS = {
+  inicio: "Inicio de Recorrido",
+  gestion: "Registro de Gestión",
+  fin: "Fin de Recorrido"
+};
+
+function irARecorrido() {
+  $("#recorrido-estado").classList.add("hidden");
+  showView("view-recorrido");
+}
+
+async function registrarRecorrido(tipo, boton) {
+  const textoOriginal = boton.querySelector("span:last-child").textContent;
+  boton.disabled = true;
+  boton.querySelector("span:last-child").textContent = "Guardando…";
+
+  const placa = $("#recorrido-placa").value.trim().toUpperCase();
+  const geo = await getGeo();
+  const payload = {
+    tipo: "recorrido",
+    subtipo: tipo,
+    timestamp: nowISO(),
+    placa: placa,
+    conductor: state.conductor,
+    lat: geo ? geo.lat : "",
+    lng: geo ? geo.lng : ""
+  };
+
+  const resultado = await sendToBackend(payload);
+  actualizarBadgeCola();
+
+  const estado = $("#recorrido-estado");
+  estado.textContent = `${RECORRIDO_LABELS[tipo]} registrado a las ${new Date().toLocaleTimeString()}${resultado.offline ? " (pendiente por sincronizar)" : ""}`;
+  estado.classList.remove("hidden");
+
+  boton.querySelector("span:last-child").textContent = textoOriginal;
+  boton.disabled = false;
+}
+
 /* ---------- Botón de pánico ---------- */
 
 function abrirPanico() {
@@ -347,6 +388,7 @@ async function confirmarFormacion() {
 document.addEventListener("DOMContentLoaded", () => {
   initIdentificacion();
   actualizarBadgeCola();
+  $("#btn-siniestro").href = VIALIX_CONFIG.URL_SINIESTRO_VIAL;
 
   $("#btn-guardar-conductor").addEventListener("click", guardarConductor);
   $("#btn-cambiar-conductor").addEventListener("click", cambiarConductor);
@@ -363,6 +405,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   $("#btn-formacion").addEventListener("click", abrirFormacion);
   $("#btn-confirmar-formacion").addEventListener("click", confirmarFormacion);
+
+  $("#btn-recorrido").addEventListener("click", irARecorrido);
+  $("#btn-volver-home-recorrido").addEventListener("click", irAHome);
+  $("#btn-recorrido-inicio").addEventListener("click", (e) => registrarRecorrido("inicio", e.currentTarget));
+  $("#btn-recorrido-gestion").addEventListener("click", (e) => registrarRecorrido("gestion", e.currentTarget));
+  $("#btn-recorrido-fin").addEventListener("click", (e) => registrarRecorrido("fin", e.currentTarget));
 
   $all(".btn-panico").forEach(b => b.addEventListener("click", abrirPanico));
   $("#btn-cerrar-panico").addEventListener("click", cerrarPanico);

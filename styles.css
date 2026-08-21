@@ -5,6 +5,8 @@
   --rojo: #D64545;
   --ambar: #E08E1D;
   --azul: #2F6FB0;
+  --naranja: #C1440E;
+  --morado: #6B4FA0;
   --gris-bg: #F4F6F5;
   --gris-texto: #333333;
   --gris-claro: #E5E9E7;
@@ -177,6 +179,16 @@ p { line-height: 1.45; color: #555; }
 .btn-ambar { background: var(--ambar); }
 .btn-azul { background: var(--azul); }
 .btn-accion.btn-panico { background: var(--rojo); }
+.btn-siniestro { background: var(--naranja); text-decoration: none; }
+.btn-morado { background: var(--morado); }
+.btn-rojo { background: var(--rojo); }
+
+.recorrido-estado {
+  text-align: center;
+  font-weight: 700;
+  color: var(--verde-oscuro);
+  margin: 4px 0 12px;
+}
 
 .cola-info {
   text-align: center;

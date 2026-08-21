@@ -21,6 +21,10 @@ const VIALIX_CONFIG = {
   // Duración sugerida del ejercicio de respiración (segundos)
   DURACION_ENFOQUE_MENTAL: 45,
 
+  // Enlace al formulario de Reporte de Siniestro Vial para Colaboradores.
+  // Aparece como botón en el inicio; cámbialo si la empresa usa otro formulario.
+  URL_SINIESTRO_VIAL: "https://forms.cloud.microsoft/r/yd3MhvZ38j",
+
   // Categorías de chequeo preoperacional. Al tocar "Iniciar chequeo",
   // el conductor ve este panel y elige su tipo de vehículo; cada opción
   // lo lleva al formulario que la empresa ya usa para esa categoría.

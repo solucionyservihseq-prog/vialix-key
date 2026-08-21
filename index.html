@@ -68,6 +68,16 @@
       <span>Botón de pánico</span>
     </button>
 
+    <a id="btn-siniestro" class="btn-accion btn-siniestro" target="_blank" rel="noopener">
+      <span class="btn-accion-icono">🚨</span>
+      <span>Reporte de Siniestro Vial (Colaboradores)</span>
+    </a>
+
+    <button type="button" id="btn-recorrido" class="btn-accion btn-morado">
+      <span class="btn-accion-icono">🛣️</span>
+      <span>Registro de recorrido</span>
+    </button>
+
     <div id="cola-badge-cont" class="cola-info">
       <span id="cola-badge" class="hidden">0</span>
       <span>registros pendientes por sincronizar</span>
@@ -98,6 +108,37 @@
     <p class="categorias-ayuda">Elige el tipo de vehículo. Se abrirá el formulario de chequeo en una pestaña nueva.</p>
     <div id="categorias-lista" class="categorias-lista"></div>
     <button type="button" id="btn-volver-home-categorias" class="btn-link">← Volver al inicio</button>
+  </section>
+
+  <!-- Registro de recorrido -->
+  <section id="view-recorrido" class="view">
+    <div class="card">
+      <h1>Registro de recorrido</h1>
+      <p>Marca cada momento del recorrido. Se guarda con tu ubicación y la hora exacta.</p>
+      <label class="campo">
+        Placa del vehículo (opcional)
+        <input type="text" id="recorrido-placa" placeholder="Ej: ABC123" style="text-transform:uppercase">
+      </label>
+    </div>
+
+    <button type="button" id="btn-recorrido-inicio" class="btn-accion btn-verde">
+      <span class="btn-accion-icono">🟢</span>
+      <span>Inicio de Recorrido</span>
+    </button>
+
+    <button type="button" id="btn-recorrido-gestion" class="btn-accion btn-azul">
+      <span class="btn-accion-icono">🚩</span>
+      <span>Registro de Gestión</span>
+    </button>
+
+    <button type="button" id="btn-recorrido-fin" class="btn-accion btn-rojo">
+      <span class="btn-accion-icono">🏁</span>
+      <span>Fin de Recorrido</span>
+    </button>
+
+    <p id="recorrido-estado" class="recorrido-estado hidden"></p>
+
+    <button type="button" id="btn-volver-home-recorrido" class="btn-link">← Volver al inicio</button>
   </section>
 
   <!-- Enviando -->
