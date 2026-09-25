@@ -1,4 +1,4 @@
-const CACHE_NAME = "vialix-key-v10";
+const CACHE_NAME = "vialix-key-v11";
 const ASSETS = [
   "./",
   "./index.html",
@@ -15,7 +15,11 @@ const ASSETS = [
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+    // cache: "reload" evita copiar archivos viejos que el navegador o el CDN de
+    // GitHub aún tengan guardados (hasta ~10 min) al instalar una versión nueva.
+    caches.open(CACHE_NAME).then((cache) =>
+      cache.addAll(ASSETS.map((url) => new Request(url, { cache: "reload" })))
+    )
   );
   self.skipWaiting();
 });
