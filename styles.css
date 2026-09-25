@@ -43,15 +43,6 @@ body {
 }
 .topbar-logo span { color: var(--dorado); }
 
-.topbar-panico {
-  background: var(--rojo);
-  color: white;
-  border: none;
-  border-radius: 20px;
-  padding: 8px 14px;
-  font-weight: 700;
-  font-size: 0.85rem;
-}
 
 .brand-bar {
   background: var(--blanco);
@@ -178,7 +169,6 @@ p { line-height: 1.45; color: #555; }
 .btn-verde { background: var(--verde); }
 .btn-ambar { background: var(--ambar); }
 .btn-azul { background: var(--azul); }
-.btn-accion.btn-panico { background: var(--rojo); }
 .btn-siniestro { background: var(--naranja); text-decoration: none; }
 .btn-morado { background: var(--morado); }
 .btn-rojo { background: var(--rojo); }
@@ -303,39 +293,97 @@ p { line-height: 1.45; color: #555; }
 /* Formación */
 .formacion-texto { font-size: 1.05rem; margin: 14px 0 20px; }
 
-/* Modal pánico */
-.modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  z-index: 50;
-  align-items: flex-end;
-}
-.modal.active { display: flex; }
-.modal-contenido {
-  background: white;
-  width: 100%;
-  border-radius: 20px 20px 0 0;
-  padding: 24px;
-  max-width: 520px;
-  margin: 0 auto;
-}
-.panico-numeros { display: flex; flex-direction: column; gap: 10px; margin: 14px 0; }
-.panico-boton {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--gris-bg);
-  border-radius: 12px;
-  padding: 14px;
-  text-decoration: none;
-  color: var(--gris-texto);
-  font-weight: 600;
-}
-.panico-boton strong { color: var(--rojo); }
-.btn-alerta { background: var(--rojo); margin-top: 4px; }
 
 @media (min-width: 600px) {
   #app { padding: 24px; }
 }
+
+/* Logo del cliente (Eficacia | Extras) en su propia fila */
+.brand-logo-cliente { flex-basis: 100%; height: 34px; width: auto; object-fit: contain; }
+
+/* ===== EMERGENCIAS ===== */
+.emergencia-titulo {
+  background: var(--rojo);
+  color: white;
+  border-radius: var(--radio);
+  padding: 18px;
+  text-align: center;
+  margin-bottom: 14px;
+}
+.emergencia-titulo h1 { color: white; font-size: 2rem; letter-spacing: 2px; margin: 0; }
+.emergencia-titulo p { color: white; margin: 6px 0 0; font-weight: 600; }
+.emergencia-icono { font-size: 2.4rem; }
+
+.emergencia-pregunta { font-size: 1.15rem; font-weight: 800; color: var(--gris-texto); margin: 10px 0 8px; }
+.emergencia-opciones { display: flex; gap: 12px; margin-bottom: 14px; }
+.btn-heridos {
+  flex: 1;
+  min-height: 72px;
+  border: 3px solid transparent;
+  border-radius: var(--radio);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: white;
+  cursor: pointer;
+}
+.btn-heridos-si { background: var(--rojo); }
+.btn-heridos-no { background: var(--verde); }
+.btn-heridos.activo { border-color: var(--gris-texto); box-shadow: 0 0 0 3px rgba(0,0,0,0.15); }
+
+.guia { border-radius: var(--radio); padding: 16px; margin-bottom: 14px; background: white; }
+.guia h2 { margin-top: 0; }
+.guia-rojo { border-left: 8px solid var(--rojo); }
+.guia-verde { border-left: 8px solid var(--verde); }
+.pas-lista { padding-left: 20px; margin: 0; }
+.pas-lista li { margin-bottom: 12px; line-height: 1.45; font-size: 1rem; color: var(--gris-texto); }
+
+.emergencia-subtitulo { font-weight: 800; margin: 18px 0 8px; color: var(--gris-texto); }
+.llamadas { display: flex; flex-direction: column; gap: 14px; margin-bottom: 16px; }
+.llamada {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 84px;
+  padding: 16px 18px;
+  border-radius: var(--radio);
+  color: white;
+  text-decoration: none;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+}
+.llamada-icono { font-size: 2.2rem; }
+.llamada-texto { display: flex; flex-direction: column; }
+.llamada-texto strong { font-size: 1.25rem; }
+.llamada-texto small { font-size: 0.95rem; opacity: 0.95; }
+.llamada-rojo { background: var(--rojo); min-height: 104px; }
+.llamada-rojo .llamada-texto strong { font-size: 1.6rem; }
+.llamada-azul { background: var(--azul); }
+.llamada-verde { background: #1E9E4F; }
+.llamada-gris { background: #4A5560; }
+
+.btn-continuar {
+  width: 100%;
+  min-height: 64px;
+  margin-top: 6px;
+  border: 3px solid var(--verde);
+  border-radius: var(--radio);
+  background: white;
+  color: var(--verde-oscuro);
+  font-size: 1.05rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* Botón gigante (conductor ocasional / formulario de siniestro) */
+.btn-gigante {
+  display: block;
+  margin: 18px 0 8px;
+  padding: 34px 16px;
+  border-radius: var(--radio);
+  background: var(--verde);
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+.btn-gigante-naranja { background: var(--naranja); }

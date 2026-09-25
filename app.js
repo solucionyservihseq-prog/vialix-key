@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    VIALIX KEY - Lógica de la aplicación
    ============================================================ */
 
@@ -10,7 +10,8 @@ const STORAGE_KEYS = {
 
 const state = {
   conductor: null,
-  identificacion: null
+  identificacion: null,
+  ultimaGeo: null // ubicación más reciente, para registrar la alerta sin demorar la llamada
 };
 
 /* ---------- Utilidades ---------- */
@@ -121,18 +122,75 @@ function actualizarBadgeCola() {
   }
 }
 
+/* ---------- Emergencias (primera pantalla) ---------- */
+
+// Actualiza en segundo plano la ubicación (así el toque en un botón de
+// llamada no espera al GPS) y pide el permiso desde el primer momento.
+async function refrescarUbicacion() {
+  const geo = await getGeo();
+  if (geo) state.ultimaGeo = geo;
+}
+
+// Cada toque en un botón de llamada deja registrado dónde y cuándo se pidió
+// ayuda. Se guarda primero en la cola local y luego se sincroniza, para que
+// no se pierda aunque el teléfono pase a la pantalla de llamada.
+function registrarAlertaEmergencia(linea) {
+  queuePending({
+    tipo: "panico",
+    timestamp: nowISO(),
+    conductor: state.conductor || "SIN_IDENTIFICAR",
+    identificacion: state.identificacion || "",
+    linea: linea.nombre,
+    lat: state.ultimaGeo ? state.ultimaGeo.lat : "",
+    lng: state.ultimaGeo ? state.ultimaGeo.lng : ""
+  });
+  actualizarBadgeCola();
+  reintentarCola();
+}
+
+function renderLlamadas(idContenedor) {
+  const cont = $(idContenedor);
+  cont.innerHTML = "";
+  VIALIX_CONFIG.LINEAS_EMERGENCIA.forEach((linea) => {
+    const a = document.createElement("a");
+    a.className = `llamada llamada-${linea.estilo || "gris"}`;
+    a.href = linea.enlace;
+    if (linea.externo) {
+      a.target = "_blank";
+      a.rel = "noopener";
+    }
+    a.addEventListener("click", () => registrarAlertaEmergencia(linea));
+    a.innerHTML = `
+      <span class="llamada-icono">${linea.icono || "📞"}</span>
+      <span class="llamada-texto">
+        <strong>${linea.nombre}</strong>
+        <small>${linea.detalle || ""}</small>
+      </span>
+    `;
+    cont.appendChild(a);
+  });
+}
+
+function mostrarGuiaEmergencia(hayHeridos) {
+  $("#guia-heridos").classList.toggle("hidden", !hayHeridos);
+  $("#guia-sin-heridos").classList.toggle("hidden", hayHeridos);
+  $("#btn-hay-heridos").classList.toggle("activo", hayHeridos);
+  $("#btn-no-heridos").classList.toggle("activo", !hayHeridos);
+}
+
 /* ---------- Identificación del conductor ---------- */
 
 function initIdentificacion() {
   const conductorGuardado = localStorage.getItem(STORAGE_KEYS.CONDUCTOR);
   const identificacionGuardada = localStorage.getItem(STORAGE_KEYS.IDENTIFICACION);
   if (conductorGuardado && identificacionGuardada) {
+    // Un conductor guardado en este celular es un conductor recurrente.
     state.conductor = conductorGuardado;
     state.identificacion = identificacionGuardada;
     irAHome();
   } else {
     if (conductorGuardado) $("#input-conductor").value = conductorGuardado;
-    showView("view-conductor");
+    showView("view-tipo");
   }
 }
 
@@ -156,7 +214,7 @@ function cambiarConductor() {
   state.conductor = null;
   state.identificacion = null;
   $("#input-identificacion").value = "";
-  showView("view-conductor");
+  showView("view-tipo");
 }
 
 /* ---------- Home ---------- */
@@ -335,45 +393,6 @@ async function registrarRecorrido(tipo, boton) {
   boton.disabled = false;
 }
 
-/* ---------- Botón de pánico ---------- */
-
-function abrirPanico() {
-  const cont = $("#panico-numeros");
-  cont.innerHTML = VIALIX_CONFIG.NUMEROS_EMERGENCIA.map(n => `
-    <a class="panico-boton" href="tel:${n.numero}">
-      <span>${n.nombre}</span>
-      <strong>${n.numero}</strong>
-    </a>
-  `).join("");
-  $("#modal-panico").classList.add("active");
-}
-
-function cerrarPanico() {
-  $("#modal-panico").classList.remove("active");
-}
-
-async function enviarAlertaPanico() {
-  const boton = $("#btn-alerta-panico");
-  boton.disabled = true;
-  boton.textContent = "Enviando alerta…";
-  const geo = await getGeo();
-  const payload = {
-    tipo: "panico",
-    timestamp: nowISO(),
-    conductor: state.conductor || "SIN_IDENTIFICAR",
-    identificacion: state.identificacion || "",
-    lat: geo ? geo.lat : "",
-    lng: geo ? geo.lng : ""
-  };
-  await sendToBackend(payload);
-  boton.textContent = "Alerta enviada ✓";
-  actualizarBadgeCola();
-  setTimeout(() => {
-    boton.disabled = false;
-    boton.textContent = "Enviar alerta de pánico";
-  }, 4000);
-}
-
 /* ---------- Micro-formación ---------- */
 
 function abrirFormacion() {
@@ -402,9 +421,32 @@ async function confirmarFormacion() {
 /* ---------- Inicialización ---------- */
 
 document.addEventListener("DOMContentLoaded", () => {
-  initIdentificacion();
+  // Lo primero que se ve al escanear el sticker es la pantalla de EMERGENCIAS.
+  state.conductor = localStorage.getItem(STORAGE_KEYS.CONDUCTOR);
+  state.identificacion = localStorage.getItem(STORAGE_KEYS.IDENTIFICACION);
+  refrescarUbicacion();
+  renderLlamadas("#emergencia-llamadas");
+  renderLlamadas("#siniestro-llamadas");
+  showView("view-emergencia");
   actualizarBadgeCola();
-  $("#btn-siniestro").href = VIALIX_CONFIG.URL_SINIESTRO_VIAL;
+
+  $("#btn-hay-heridos").addEventListener("click", () => mostrarGuiaEmergencia(true));
+  $("#btn-no-heridos").addEventListener("click", () => mostrarGuiaEmergencia(false));
+  $("#btn-continuar-app").addEventListener("click", initIdentificacion);
+
+  // Segmentación de conductores
+  $("#btn-tipo-recurrente").addEventListener("click", () => showView("view-conductor"));
+  $("#btn-tipo-ocasional").addEventListener("click", () => showView("view-ocasional"));
+  $("#btn-volver-tipo").addEventListener("click", () => showView("view-tipo"));
+  $("#btn-formulario-ocasional").href = VIALIX_CONFIG.URL_FORMULARIO_OCASIONAL;
+
+  // Siniestro vial: único punto de entrada para emergencias y choques
+  $("#btn-siniestro").addEventListener("click", () => {
+    refrescarUbicacion();
+    showView("view-siniestro");
+  });
+  $("#btn-siniestro-form").href = VIALIX_CONFIG.URL_SINIESTRO_VIAL;
+  $("#btn-volver-home-siniestro").addEventListener("click", irAHome);
 
   $("#btn-guardar-conductor").addEventListener("click", guardarConductor);
   $("#btn-cambiar-conductor").addEventListener("click", cambiarConductor);
@@ -427,10 +469,6 @@ document.addEventListener("DOMContentLoaded", () => {
   $("#btn-recorrido-inicio").addEventListener("click", (e) => registrarRecorrido("inicio", e.currentTarget));
   $("#btn-recorrido-gestion").addEventListener("click", (e) => registrarRecorrido("gestion", e.currentTarget));
   $("#btn-recorrido-fin").addEventListener("click", (e) => registrarRecorrido("fin", e.currentTarget));
-
-  $all(".btn-panico").forEach(b => b.addEventListener("click", abrirPanico));
-  $("#btn-cerrar-panico").addEventListener("click", cerrarPanico);
-  $("#btn-alerta-panico").addEventListener("click", enviarAlertaPanico);
 
   window.addEventListener("online", reintentarCola);
   reintentarCola();

@@ -9,14 +9,21 @@ const VIALIX_CONFIG = {
   APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbxor_-nkxTJTrkvsADjAKWYE6Axrdmb5_JebaFlhOY2s9fHp71lPzY43-7aYYE4Jf60qQ/exec",
 
   // Nombre del cliente/empresa piloto (aparece en el encabezado de la app)
-  NOMBRE_CLIENTE: "Piloto VIALIX KEY",
+  NOMBRE_CLIENTE: "Eficacia - Extras",
 
-  // Números de emergencia para el botón de pánico.
-  // Reemplázalos por los reales del cliente y de la ARL cuando los tengas.
-  NUMEROS_EMERGENCIA: [
-    { nombre: "Línea de emergencias nacional", numero: "123" },
-    { nombre: "Contacto de emergencia", numero: "+573054395567" }
+  // Botones de llamada rápida de la pantalla de EMERGENCIAS.
+  // "enlace" es lo que se abre al tocar (tel: para llamar, https://wa.me/... para WhatsApp).
+  // "estilo": rojo | azul | verde | gris (define el color del botón).
+  LINEAS_EMERGENCIA: [
+    { nombre: "Emergencias 123", detalle: "Ambulancia y Policía", enlace: "tel:123", estilo: "rojo", icono: "🚑" },
+    // EJEMPLO: actualiza con la línea real de ARL Bolívar (en "enlace", el # se escribe %23).
+    { nombre: "Línea ARL Bolívar #322", detalle: "Contacto directo con la ARL", enlace: "tel:%23322", estilo: "azul", icono: "🛡️" },
+    { nombre: "Línea Eficacia", detalle: "(333) 033 47 07", enlace: "tel:+573330334707", estilo: "gris", icono: "📞" },
+    { nombre: "WhatsApp Eficacia", detalle: "315 500 0035", enlace: "https://wa.me/573155000035", estilo: "verde", icono: "💬", externo: true }
   ],
+
+  // Formulario que debe diligenciar el conductor OCASIONAL (no ve el menú de la app).
+  URL_FORMULARIO_OCASIONAL: "https://forms.cloud.microsoft/r/tfXVmkXqfx",
 
   // Duración sugerida del ejercicio de respiración (segundos)
   DURACION_ENFOQUE_MENTAL: 45,
