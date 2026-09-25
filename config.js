@@ -25,6 +25,9 @@ const VIALIX_CONFIG = {
   // Formulario que debe diligenciar el conductor OCASIONAL (no ve el menú de la app).
   URL_FORMULARIO_OCASIONAL: "https://forms.cloud.microsoft/r/tfXVmkXqfx",
 
+  // Formulario donde se actualizan los datos del conductor y del vehículo.
+  URL_ACTUALIZACION_DATOS: "https://forms.cloud.microsoft/r/G5tLKUcFH7",
+
   // Duración sugerida del ejercicio de respiración (segundos)
   DURACION_ENFOQUE_MENTAL: 45,
 

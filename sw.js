@@ -1,4 +1,4 @@
-const CACHE_NAME = "vialix-key-v13";
+const CACHE_NAME = "vialix-key-v14";
 const ASSETS = [
   "./",
   "./index.html",

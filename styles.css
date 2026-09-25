@@ -373,6 +373,7 @@ p { line-height: 1.45; color: #555; }
   font-weight: 800;
 }
 .btn-gigante-naranja { background: var(--naranja); }
+.btn-gigante-azul { background: var(--azul); }
 
 /* ===== Pantalla inicial: botón rojo de emergencias ===== */
 .btn-emergencias-viales {

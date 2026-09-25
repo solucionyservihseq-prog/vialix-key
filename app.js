@@ -541,6 +541,7 @@ document.addEventListener("DOMContentLoaded", () => {
   $("#btn-tipo-ocasional").addEventListener("click", () => elegirTipo("ocasional"));
   $("#btn-volver-tipo").addEventListener("click", renderInicio);
   $("#btn-formulario-ocasional").href = VIALIX_CONFIG.URL_FORMULARIO_OCASIONAL;
+  $("#btn-actualizar-datos").href = VIALIX_CONFIG.URL_ACTUALIZACION_DATOS;
   $("#btn-entrar-guardado").addEventListener("click", entrarSegunTipo);
   $("#btn-cambiar-guardado").addEventListener("click", cambiarConductor);
 
