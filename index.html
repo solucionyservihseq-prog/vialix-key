@@ -25,59 +25,33 @@
 
 <main id="app">
 
-  <!-- EMERGENCIAS: primera pantalla al escanear el sticker (Protocolo PAS) -->
-  <section id="view-emergencia" class="view">
-    <div class="emergencia-titulo">
-      <span class="emergencia-icono">🚨</span>
-      <h1>EMERGENCIAS</h1>
-      <p>¿Tuviste un choque o presenciaste uno? Sigue esta guía.</p>
-    </div>
+  <!-- INICIO: botón de emergencias + validación del conductor -->
+  <section id="view-inicio" class="view">
+    <button type="button" id="btn-emergencias-viales" class="btn-emergencias-viales">
+      🚨 EMERGENCIAS VIALES
+      <small>(Clic aquí en caso de accidente)</small>
+    </button>
 
-    <p class="emergencia-pregunta">¿Hay personas heridas?</p>
-    <div class="emergencia-opciones">
-      <button type="button" id="btn-hay-heridos" class="btn-heridos btn-heridos-si">SÍ, hay heridos</button>
-      <button type="button" id="btn-no-heridos" class="btn-heridos btn-heridos-no">NO, solo latas</button>
-    </div>
-
-    <div id="guia-heridos" class="guia guia-rojo hidden">
-      <h2>Protocolo PAS</h2>
-      <ol class="pas-lista">
-        <li><strong>PROTEGER:</strong> asegura el área para evitar un segundo accidente (luces de parqueo, señales reflectivas, aleja a las personas de la vía).</li>
-        <li><strong>AVISAR (¡lo más importante!):</strong> pide ayuda y solicita una ambulancia de inmediato llamando al 123. Luego sigue el protocolo de comunicación de la empresa.</li>
-        <li><strong>SOCORRER:</strong> actúa solo dentro de los límites del primer respondiente. Si es una urgencia vital, traslada al herido al centro médico más cercano (cobertura SOAT).</li>
-      </ol>
-    </div>
-
-    <div id="guia-sin-heridos" class="guia guia-verde hidden">
-      <h2>Solo daños materiales</h2>
-      <ul class="pas-lista">
-        <li>Mantente en un lugar seguro y señaliza el lugar del hecho.</li>
-        <li>Toma <strong>fotografías actuales del lugar</strong>: posición de los vehículos, placas, daños, la vía y su señalización, antes de moverlos si es posible.</li>
-        <li>Toma los datos y fotos de los documentos de la otra parte y de los testigos.</li>
-        <li>Sigue las indicaciones de la autoridad de tránsito y el procedimiento de la empresa, de acuerdo con el marco normativo vigente.</li>
-        <li>Conserva toda la evidencia: la necesitarás para el reporte.</li>
-      </ul>
-    </div>
-
-    <p class="emergencia-subtitulo">Llamada rápida (un toque)</p>
-    <div id="emergencia-llamadas" class="llamadas"></div>
-
-    <button type="button" id="btn-continuar-app" class="btn-continuar">Continuar a la aplicación / Realizar reportes →</button>
-  </section>
-
-  <!-- Tipo de conductor -->
-  <section id="view-tipo" class="view">
     <div class="card">
       <h1>Bienvenido a VIALIX KEY</h1>
-      <p>¿Qué tipo de conductor eres?</p>
-      <button type="button" id="btn-tipo-recurrente" class="btn-accion btn-verde">
-        <span class="btn-accion-icono">🔁</span>
-        <span>Conductor recurrente</span>
-      </button>
-      <button type="button" id="btn-tipo-ocasional" class="btn-accion btn-azul">
-        <span class="btn-accion-icono">🕐</span>
-        <span>Conductor ocasional</span>
-      </button>
+
+      <div id="bloque-nuevo">
+        <p>¿Qué tipo de conductor eres?</p>
+        <button type="button" id="btn-tipo-recurrente" class="btn-accion btn-verde">
+          <span class="btn-accion-icono">🔁</span>
+          <span>Conductor permanente</span>
+        </button>
+        <button type="button" id="btn-tipo-ocasional" class="btn-accion btn-azul">
+          <span class="btn-accion-icono">🕐</span>
+          <span>Conductor ocasional</span>
+        </button>
+      </div>
+
+      <div id="bloque-guardado" class="hidden">
+        <p>Conductor: <strong id="inicio-nombre">--</strong></p>
+        <button type="button" id="btn-entrar-guardado" class="btn-primario">Entrar a la aplicación</button>
+        <button type="button" id="btn-cambiar-guardado" class="btn-link">No soy yo / cambiar conductor</button>
+      </div>
     </div>
   </section>
 
@@ -89,17 +63,6 @@
       <a id="btn-formulario-ocasional" class="btn-gigante" target="_blank" rel="noopener">📝 Abrir formulario</a>
       <button type="button" id="btn-volver-tipo" class="btn-link">← Volver</button>
     </div>
-  </section>
-
-  <!-- Siniestro vial: único punto de entrada para emergencias y choques -->
-  <section id="view-siniestro" class="view">
-    <div class="card">
-      <h1>Reporte de Siniestro Vial</h1>
-      <p>Si aún necesitas ayuda, llama ahora. Cuando estés en un lugar seguro, diligencia el reporte.</p>
-    </div>
-    <div id="siniestro-llamadas" class="llamadas"></div>
-    <a id="btn-siniestro-form" class="btn-gigante btn-gigante-naranja" target="_blank" rel="noopener">🚨 Abrir formulario de Reporte de Siniestro Vial</a>
-    <button type="button" id="btn-volver-home-siniestro" class="btn-link">← Volver al inicio</button>
   </section>
 
   <!-- Identificación del conductor (primera vez) -->
@@ -130,11 +93,6 @@
       <p class="valor" id="home-identificacion">--</p>
       <button type="button" id="btn-cambiar-conductor" class="btn-link">Cambiar conductor</button>
     </div>
-
-    <button type="button" id="btn-siniestro" class="btn-accion btn-siniestro">
-      <span class="btn-accion-icono">🚨</span>
-      <span>Reporte de Siniestro Vial (emergencias y choques)</span>
-    </button>
 
     <button type="button" id="btn-iniciar-chequeo" class="btn-accion btn-verde">
       <span class="btn-accion-icono">✅</span>
@@ -279,6 +237,50 @@
   </section>
 
 </main>
+
+<!-- EMERGENCIAS VIALES: superposición a pantalla completa, oculta por defecto -->
+<div id="modal-emergencia" class="modal-emergencia" role="dialog" aria-modal="true" aria-label="Emergencias viales">
+  <div class="modal-emergencia-contenido">
+    <button type="button" id="btn-cerrar-emergencia-x" class="btn-cerrar-x" aria-label="Cerrar">✕</button>
+    <div class="emergencia-titulo">
+      <span class="emergencia-icono">🚨</span>
+      <h1>EMERGENCIAS</h1>
+      <p>¿Tuviste un choque o presenciaste uno? Sigue esta guía.</p>
+    </div>
+
+    <p class="emergencia-pregunta">¿Hay personas heridas?</p>
+    <div class="emergencia-opciones">
+      <button type="button" id="btn-hay-heridos" class="btn-heridos btn-heridos-si">SÍ, hay heridos</button>
+      <button type="button" id="btn-no-heridos" class="btn-heridos btn-heridos-no">NO, solo latas</button>
+    </div>
+
+    <div id="guia-heridos" class="guia guia-rojo hidden">
+      <h2>Protocolo PAS</h2>
+      <ol class="pas-lista">
+        <li><strong>PROTEGER:</strong> asegura el área para evitar un segundo accidente (luces de parqueo, señales reflectivas, aleja a las personas de la vía).</li>
+        <li><strong>AVISAR (¡lo más importante!):</strong> pide ayuda y solicita una ambulancia de inmediato llamando al 123. Luego sigue el protocolo de comunicación de la empresa.</li>
+        <li><strong>SOCORRER:</strong> actúa solo dentro de los límites del primer respondiente. Si es una urgencia vital, traslada al herido al centro médico más cercano (cobertura SOAT).</li>
+      </ol>
+    </div>
+
+    <div id="guia-sin-heridos" class="guia guia-verde hidden">
+      <h2>Solo daños materiales</h2>
+      <ul class="pas-lista">
+        <li>Mantente en un lugar seguro y señaliza el lugar del hecho.</li>
+        <li>Toma <strong>fotografías actuales del lugar</strong>: posición de los vehículos, placas, daños, la vía y su señalización, antes de moverlos si es posible.</li>
+        <li>Toma los datos y fotos de los documentos de la otra parte y de los testigos.</li>
+        <li>Sigue las indicaciones de la autoridad de tránsito y el procedimiento de la empresa, de acuerdo con el marco normativo vigente.</li>
+        <li>Conserva toda la evidencia: la necesitarás para el reporte.</li>
+      </ul>
+    </div>
+
+    <p class="emergencia-subtitulo">Llamada rápida (un toque)</p>
+    <div id="emergencia-llamadas" class="llamadas"></div>
+
+    <a id="btn-siniestro-form" class="btn-gigante btn-gigante-naranja" target="_blank" rel="noopener">📝 Ya estoy a salvo: diligenciar reporte de siniestro</a>
+    <button type="button" id="btn-volver-emergencia" class="btn-volver-emergencia">← Volver al inicio</button>
+  </div>
+</div>
 
 <script src="config.js"></script>
 <script src="app.js"></script>

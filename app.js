@@ -171,6 +171,16 @@ function renderLlamadas(idContenedor) {
   });
 }
 
+function abrirEmergencias() {
+  refrescarUbicacion();
+  $("#modal-emergencia").classList.add("active");
+  $("#modal-emergencia").scrollTop = 0;
+}
+
+function cerrarEmergencias() {
+  $("#modal-emergencia").classList.remove("active");
+}
+
 function mostrarGuiaEmergencia(hayHeridos) {
   $("#guia-heridos").classList.toggle("hidden", !hayHeridos);
   $("#guia-sin-heridos").classList.toggle("hidden", hayHeridos);
@@ -180,18 +190,13 @@ function mostrarGuiaEmergencia(hayHeridos) {
 
 /* ---------- Identificación del conductor ---------- */
 
-function initIdentificacion() {
-  const conductorGuardado = localStorage.getItem(STORAGE_KEYS.CONDUCTOR);
-  const identificacionGuardada = localStorage.getItem(STORAGE_KEYS.IDENTIFICACION);
-  if (conductorGuardado && identificacionGuardada) {
-    // Un conductor guardado en este celular es un conductor recurrente.
-    state.conductor = conductorGuardado;
-    state.identificacion = identificacionGuardada;
-    irAHome();
-  } else {
-    if (conductorGuardado) $("#input-conductor").value = conductorGuardado;
-    showView("view-tipo");
-  }
+function renderInicio() {
+  // Un conductor guardado en este celular es un conductor permanente.
+  const guardado = !!(state.conductor && state.identificacion);
+  $("#bloque-nuevo").classList.toggle("hidden", guardado);
+  $("#bloque-guardado").classList.toggle("hidden", !guardado);
+  if (guardado) $("#inicio-nombre").textContent = state.conductor;
+  showView("view-inicio");
 }
 
 function guardarConductor() {
@@ -214,7 +219,7 @@ function cambiarConductor() {
   state.conductor = null;
   state.identificacion = null;
   $("#input-identificacion").value = "";
-  showView("view-tipo");
+  renderInicio();
 }
 
 /* ---------- Home ---------- */
@@ -426,27 +431,25 @@ document.addEventListener("DOMContentLoaded", () => {
   state.identificacion = localStorage.getItem(STORAGE_KEYS.IDENTIFICACION);
   refrescarUbicacion();
   renderLlamadas("#emergencia-llamadas");
-  renderLlamadas("#siniestro-llamadas");
-  showView("view-emergencia");
+  $("#btn-siniestro-form").href = VIALIX_CONFIG.URL_SINIESTRO_VIAL;
+  renderInicio();
   actualizarBadgeCola();
 
+  // Emergencias viales: superposición oculta hasta que se toque el botón rojo
+  $("#btn-emergencias-viales").addEventListener("click", abrirEmergencias);
+  $("#btn-cerrar-emergencia-x").addEventListener("click", cerrarEmergencias);
+  $("#btn-volver-emergencia").addEventListener("click", cerrarEmergencias);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") cerrarEmergencias(); });
   $("#btn-hay-heridos").addEventListener("click", () => mostrarGuiaEmergencia(true));
   $("#btn-no-heridos").addEventListener("click", () => mostrarGuiaEmergencia(false));
-  $("#btn-continuar-app").addEventListener("click", initIdentificacion);
 
-  // Segmentación de conductores
+  // Validación del conductor: ocasional -> formulario, permanente -> menú
   $("#btn-tipo-recurrente").addEventListener("click", () => showView("view-conductor"));
   $("#btn-tipo-ocasional").addEventListener("click", () => showView("view-ocasional"));
-  $("#btn-volver-tipo").addEventListener("click", () => showView("view-tipo"));
+  $("#btn-volver-tipo").addEventListener("click", renderInicio);
   $("#btn-formulario-ocasional").href = VIALIX_CONFIG.URL_FORMULARIO_OCASIONAL;
-
-  // Siniestro vial: único punto de entrada para emergencias y choques
-  $("#btn-siniestro").addEventListener("click", () => {
-    refrescarUbicacion();
-    showView("view-siniestro");
-  });
-  $("#btn-siniestro-form").href = VIALIX_CONFIG.URL_SINIESTRO_VIAL;
-  $("#btn-volver-home-siniestro").addEventListener("click", irAHome);
+  $("#btn-entrar-guardado").addEventListener("click", irAHome);
+  $("#btn-cambiar-guardado").addEventListener("click", cambiarConductor);
 
   $("#btn-guardar-conductor").addEventListener("click", guardarConductor);
   $("#btn-cambiar-conductor").addEventListener("click", cambiarConductor);
