@@ -1,16 +1,21 @@
-﻿/* ============================================================
+/* ============================================================
    VIALIX KEY - Lógica de la aplicación
    ============================================================ */
 
 const STORAGE_KEYS = {
   CONDUCTOR: "vialix_conductor",
   IDENTIFICACION: "vialix_identificacion",
+  PLACA: "vialix_placa",
+  TIPO: "vialix_tipo", // "permanente" | "ocasional"
   QUEUE: "vialix_queue_pendiente"
 };
 
 const state = {
   conductor: null,
   identificacion: null,
+  placa: null,
+  tipo: null,
+  ubicacion: "pendiente", // pendiente | ok | denegada | error
   ultimaGeo: null // ubicación más reciente, para registrar la alerta sin demorar la llamada
 };
 
@@ -140,6 +145,7 @@ function registrarAlertaEmergencia(linea) {
     timestamp: nowISO(),
     conductor: state.conductor || "SIN_IDENTIFICAR",
     identificacion: state.identificacion || "",
+    placa: state.placa || "",
     linea: linea.nombre,
     lat: state.ultimaGeo ? state.ultimaGeo.lat : "",
     lng: state.ultimaGeo ? state.ultimaGeo.lng : ""
@@ -188,37 +194,114 @@ function mostrarGuiaEmergencia(hayHeridos) {
   $("#btn-no-heridos").classList.toggle("activo", !hayHeridos);
 }
 
-/* ---------- Identificación del conductor ---------- */
+/* ---------- Bienvenida: datos, ubicación y tipo de conductor ---------- */
+
+// Pide el permiso de ubicación (el navegador muestra su propio aviso) y
+// espera con calma a que la persona responda, a diferencia de getGeo().
+function solicitarUbicacion() {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) return resolve("error");
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        state.ultimaGeo = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        resolve("ok");
+      },
+      (err) => resolve(err && err.code === 1 ? "denegada" : "error"),
+      { timeout: 20000, enableHighAccuracy: true }
+    );
+  });
+}
+
+function mostrarEstadoUbicacion() {
+  const el = $("#estado-ubicacion");
+  const mensajes = {
+    ok: "✅ Ubicación activada. ¡Gracias!",
+    denegada: "⚠️ No diste permiso de ubicación. Sin ella no podremos registrar dónde ocurre una emergencia. Para activarla: Ajustes del celular → Privacidad → Localización → tu navegador → \"Al usar\". Luego toca el botón de nuevo.",
+    error: "⚠️ No pudimos obtener tu ubicación (revisa que el GPS esté encendido). Puedes continuar e intentarlo más tarde."
+  };
+  el.textContent = mensajes[state.ubicacion] || "";
+  el.className = "estado-ubicacion " + (state.ubicacion === "ok" ? "estado-ok" : "estado-alerta");
+  el.classList.toggle("hidden", !mensajes[state.ubicacion]);
+  $("#btn-activar-ubicacion").classList.toggle("hidden", state.ubicacion === "ok");
+}
+
+async function activarUbicacion() {
+  const btn = $("#btn-activar-ubicacion");
+  btn.disabled = true;
+  btn.textContent = "Esperando tu respuesta…";
+  state.ubicacion = await solicitarUbicacion();
+  btn.disabled = false;
+  btn.textContent = "📍 Activar ubicación ahora";
+  mostrarEstadoUbicacion();
+}
+
+function mostrarBloqueInicio(cual) {
+  ["datos", "tipo", "guardado"].forEach((b) => $("#bloque-" + b).classList.toggle("hidden", b !== cual));
+}
 
 function renderInicio() {
-  // Un conductor guardado en este celular es un conductor permanente.
-  const guardado = !!(state.conductor && state.identificacion);
-  $("#bloque-nuevo").classList.toggle("hidden", guardado);
-  $("#bloque-guardado").classList.toggle("hidden", !guardado);
-  if (guardado) $("#inicio-nombre").textContent = state.conductor;
+  const completo = !!(state.conductor && state.identificacion && state.placa && state.tipo);
+  if (completo) {
+    $("#inicio-nombre").textContent = state.conductor;
+    $("#inicio-placa").textContent = state.placa;
+    mostrarBloqueInicio("guardado");
+  } else {
+    // Datos parciales (p. ej. de una versión anterior): se precargan para completarlos
+    if (state.conductor) $("#input-conductor").value = state.conductor;
+    if (state.identificacion) $("#input-identificacion").value = state.identificacion;
+    if (state.placa) $("#input-placa").value = state.placa;
+    mostrarBloqueInicio("datos");
+  }
   showView("view-inicio");
 }
 
-function guardarConductor() {
+async function guardarDatos() {
   const nombre = $("#input-conductor").value.trim();
   const identificacion = $("#input-identificacion").value.trim();
-  if (!nombre || !identificacion) {
-    alert("Por favor escribe tu nombre y tu número de identificación para continuar.");
+  const placa = $("#input-placa").value.trim().toUpperCase();
+  if (!nombre || !identificacion || !placa) {
+    alert("Por favor escribe tu nombre, tu número de identificación y la placa del vehículo para continuar.");
     return;
   }
   state.conductor = nombre;
   state.identificacion = identificacion;
+  state.placa = placa;
   localStorage.setItem(STORAGE_KEYS.CONDUCTOR, nombre);
   localStorage.setItem(STORAGE_KEYS.IDENTIFICACION, identificacion);
-  irAHome();
+  localStorage.setItem(STORAGE_KEYS.PLACA, placa);
+
+  // Si todavía no se pidió el permiso, se pide ahora; si lo negó, se le
+  // avisa una vez y en el siguiente toque puede continuar sin ubicación.
+  if (state.ubicacion === "pendiente") {
+    const btn = $("#btn-guardar-datos");
+    btn.disabled = true;
+    btn.textContent = "Solicitando ubicación…";
+    state.ubicacion = await solicitarUbicacion();
+    btn.disabled = false;
+    mostrarEstadoUbicacion();
+    if (state.ubicacion !== "ok") {
+      btn.textContent = "Continuar sin ubicación";
+      return;
+    }
+  }
+  $("#btn-guardar-datos").textContent = "Continuar";
+  mostrarBloqueInicio("tipo");
+}
+
+function elegirTipo(tipo) {
+  state.tipo = tipo;
+  localStorage.setItem(STORAGE_KEYS.TIPO, tipo);
+  entrarSegunTipo();
+}
+
+function entrarSegunTipo() {
+  if (state.tipo === "ocasional") showView("view-ocasional");
+  else irAHome();
 }
 
 function cambiarConductor() {
-  localStorage.removeItem(STORAGE_KEYS.CONDUCTOR);
-  localStorage.removeItem(STORAGE_KEYS.IDENTIFICACION);
-  state.conductor = null;
-  state.identificacion = null;
-  $("#input-identificacion").value = "";
+  Object.values(STORAGE_KEYS).forEach((k) => { if (k !== STORAGE_KEYS.QUEUE) localStorage.removeItem(k); });
+  state.conductor = state.identificacion = state.placa = state.tipo = null;
   renderInicio();
 }
 
@@ -227,6 +310,7 @@ function cambiarConductor() {
 function irAHome() {
   $("#home-conductor").textContent = state.conductor;
   $("#home-identificacion").textContent = state.identificacion;
+  $("#home-placa").textContent = state.placa;
   $("#home-cliente").textContent = VIALIX_CONFIG.NOMBRE_CLIENTE;
   actualizarBadgeCola();
   showView("view-home");
@@ -340,7 +424,7 @@ async function enviarNovedadLibre() {
   };
 
   await sendToBackend(payload);
-  $("#novedad-placa").value = "";
+  $("#novedad-placa").value = state.placa || "";
   $("#novedad-descripcion").value = "";
   fotoInput.value = "";
   actualizarBadgeCola();
@@ -365,6 +449,7 @@ const RECORRIDO_LABELS = {
 };
 
 function irARecorrido() {
+  $("#recorrido-placa").value = state.placa || "";
   $("#recorrido-estado").classList.add("hidden");
   showView("view-recorrido");
 }
@@ -415,6 +500,7 @@ async function confirmarFormacion() {
     timestamp: nowISO(),
     conductor: state.conductor,
     identificacion: state.identificacion,
+    placa: state.placa || "",
     tip_id: idx,
     tip_texto: VIALIX_CONFIG.MICRO_FORMACION[idx]
   };
@@ -429,7 +515,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // Lo primero que se ve al escanear el sticker es la pantalla de EMERGENCIAS.
   state.conductor = localStorage.getItem(STORAGE_KEYS.CONDUCTOR);
   state.identificacion = localStorage.getItem(STORAGE_KEYS.IDENTIFICACION);
-  refrescarUbicacion();
+  state.placa = localStorage.getItem(STORAGE_KEYS.PLACA);
+  state.tipo = localStorage.getItem(STORAGE_KEYS.TIPO);
+  // Quien ya se registró vio antes la explicación: se actualiza la ubicación en silencio.
+  // A quien es nuevo no se le pide nada hasta explicarle por qué.
+  if (state.conductor) refrescarUbicacion();
   renderLlamadas("#emergencia-llamadas");
   $("#btn-siniestro-form").href = VIALIX_CONFIG.URL_SINIESTRO_VIAL;
   renderInicio();
@@ -444,14 +534,16 @@ document.addEventListener("DOMContentLoaded", () => {
   $("#btn-no-heridos").addEventListener("click", () => mostrarGuiaEmergencia(false));
 
   // Validación del conductor: ocasional -> formulario, permanente -> menú
-  $("#btn-tipo-recurrente").addEventListener("click", () => showView("view-conductor"));
-  $("#btn-tipo-ocasional").addEventListener("click", () => showView("view-ocasional"));
+  $("#btn-guardar-datos").addEventListener("click", guardarDatos);
+  $("#btn-activar-ubicacion").addEventListener("click", activarUbicacion);
+  $("#btn-editar-datos").addEventListener("click", () => mostrarBloqueInicio("datos"));
+  $("#btn-tipo-recurrente").addEventListener("click", () => elegirTipo("permanente"));
+  $("#btn-tipo-ocasional").addEventListener("click", () => elegirTipo("ocasional"));
   $("#btn-volver-tipo").addEventListener("click", renderInicio);
   $("#btn-formulario-ocasional").href = VIALIX_CONFIG.URL_FORMULARIO_OCASIONAL;
-  $("#btn-entrar-guardado").addEventListener("click", irAHome);
+  $("#btn-entrar-guardado").addEventListener("click", entrarSegunTipo);
   $("#btn-cambiar-guardado").addEventListener("click", cambiarConductor);
 
-  $("#btn-guardar-conductor").addEventListener("click", guardarConductor);
   $("#btn-cambiar-conductor").addEventListener("click", cambiarConductor);
 
   $("#btn-iniciar-chequeo").addEventListener("click", iniciarEnfoqueMental);
@@ -459,7 +551,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   $("#btn-volver-home-categorias").addEventListener("click", irAHome);
 
-  $("#btn-reportar-novedad").addEventListener("click", () => showView("view-novedad"));
+  $("#btn-reportar-novedad").addEventListener("click", () => {
+    $("#novedad-placa").value = state.placa || "";
+    showView("view-novedad");
+  });
   $("#btn-enviar-novedad").addEventListener("click", enviarNovedadLibre);
   $("#btn-cancelar-novedad").addEventListener("click", irAHome);
   $("#btn-volver-home-novedad").addEventListener("click", irAHome);

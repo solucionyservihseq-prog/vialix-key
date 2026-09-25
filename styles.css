@@ -430,3 +430,17 @@ p { line-height: 1.45; color: #555; }
   font-weight: 800;
   cursor: pointer;
 }
+
+/* Aviso de por qué se pide la ubicación */
+.aviso-ubicacion {
+  background: #EEF5FB;
+  border-left: 6px solid var(--azul);
+  border-radius: 12px;
+  padding: 14px;
+  margin: 16px 0;
+}
+.aviso-ubicacion p { margin: 8px 0; font-size: 0.92rem; }
+.aviso-ubicacion .btn-secundario { margin-top: 6px; }
+.estado-ubicacion { font-weight: 700; }
+.estado-ok { color: var(--verde-oscuro) !important; }
+.estado-alerta { color: var(--naranja) !important; }

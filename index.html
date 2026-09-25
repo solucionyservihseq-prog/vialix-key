@@ -35,7 +35,35 @@
     <div class="card">
       <h1>Bienvenido a VIALIX KEY</h1>
 
-      <div id="bloque-nuevo">
+      <!-- Paso 1: datos del conductor y permiso de ubicación -->
+      <div id="bloque-datos">
+        <p>Antes de empezar, cuéntanos quién eres y qué vehículo vas a usar.</p>
+        <label class="campo">
+          Nombre del conductor
+          <input type="text" id="input-conductor" placeholder="Nombre completo" autocomplete="name">
+        </label>
+        <label class="campo">
+          Número de identificación (cédula)
+          <input type="text" id="input-identificacion" placeholder="Ej: 1234567890" inputmode="numeric">
+        </label>
+        <label class="campo">
+          Placa del vehículo
+          <input type="text" id="input-placa" placeholder="Ej: ABC123" maxlength="10" style="text-transform:uppercase" autocapitalize="characters">
+        </label>
+
+        <div class="aviso-ubicacion">
+          <strong>📍 ¿Por qué necesitamos tu ubicación?</strong>
+          <p>Para registrar <em>dónde</em> ocurre un accidente o una emergencia y dónde inicias y terminas tus recorridos, y así tu empresa y la ARL puedan ayudarte más rápido. Solo se guarda cuando tú usas los botones de emergencia o de recorrido.</p>
+          <p>Al continuar, tu celular te pedirá permiso: elige <strong>"Permitir"</strong>.</p>
+          <p id="estado-ubicacion" class="estado-ubicacion hidden"></p>
+          <button type="button" id="btn-activar-ubicacion" class="btn-secundario">📍 Activar ubicación ahora</button>
+        </div>
+
+        <button type="button" id="btn-guardar-datos" class="btn-primario">Continuar</button>
+      </div>
+
+      <!-- Paso 2: tipo de conductor -->
+      <div id="bloque-tipo" class="hidden">
         <p>¿Qué tipo de conductor eres?</p>
         <button type="button" id="btn-tipo-recurrente" class="btn-accion btn-verde">
           <span class="btn-accion-icono">🔁</span>
@@ -45,12 +73,14 @@
           <span class="btn-accion-icono">🕐</span>
           <span>Conductor ocasional</span>
         </button>
+        <button type="button" id="btn-editar-datos" class="btn-link">← Editar mis datos</button>
       </div>
 
+      <!-- Conductor ya registrado en este celular -->
       <div id="bloque-guardado" class="hidden">
-        <p>Conductor: <strong id="inicio-nombre">--</strong></p>
+        <p>Conductor: <strong id="inicio-nombre">--</strong><br>Placa: <strong id="inicio-placa">--</strong></p>
         <button type="button" id="btn-entrar-guardado" class="btn-primario">Entrar a la aplicación</button>
-        <button type="button" id="btn-cambiar-guardado" class="btn-link">No soy yo / cambiar conductor</button>
+        <button type="button" id="btn-cambiar-guardado" class="btn-link">Cambiar mis datos o tipo de conductor</button>
       </div>
     </div>
   </section>
@@ -65,23 +95,6 @@
     </div>
   </section>
 
-  <!-- Identificación del conductor (primera vez) -->
-  <section id="view-conductor" class="view">
-    <div class="card">
-      <h1>Bienvenido a VIALIX KEY</h1>
-      <p>¿Quién va a conducir hoy?</p>
-      <label class="campo">
-        Nombre del conductor
-        <input type="text" id="input-conductor" placeholder="Nombre completo">
-      </label>
-      <label class="campo">
-        Número de identificación (cédula)
-        <input type="text" id="input-identificacion" placeholder="Ej: 1234567890" inputmode="numeric">
-      </label>
-      <button type="button" id="btn-guardar-conductor" class="btn-primario">Continuar</button>
-    </div>
-  </section>
-
   <!-- Home -->
   <section id="view-home" class="view">
     <div class="card home-card">
@@ -91,7 +104,9 @@
       <p class="valor" id="home-conductor">--</p>
       <p class="etiqueta">Identificación</p>
       <p class="valor" id="home-identificacion">--</p>
-      <button type="button" id="btn-cambiar-conductor" class="btn-link">Cambiar conductor</button>
+      <p class="etiqueta">Placa</p>
+      <p class="valor" id="home-placa">--</p>
+      <button type="button" id="btn-cambiar-conductor" class="btn-link">Cambiar mis datos</button>
     </div>
 
     <button type="button" id="btn-iniciar-chequeo" class="btn-accion btn-verde">
