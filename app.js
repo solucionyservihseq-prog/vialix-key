@@ -6,7 +6,6 @@ const STORAGE_KEYS = {
   CONDUCTOR: "vialix_conductor",
   IDENTIFICACION: "vialix_identificacion",
   PLACA: "vialix_placa",
-  TIPO: "vialix_tipo", // "permanente" | "ocasional"
   QUEUE: "vialix_queue_pendiente"
 };
 
@@ -14,7 +13,6 @@ const state = {
   conductor: null,
   identificacion: null,
   placa: null,
-  tipo: null,
   ubicacion: "pendiente", // pendiente | ok | denegada | error
   ultimaGeo: null // ubicación más reciente, para registrar la alerta sin demorar la llamada
 };
@@ -236,20 +234,28 @@ async function activarUbicacion() {
 }
 
 function mostrarBloqueInicio(cual) {
-  ["datos", "tipo", "guardado"].forEach((b) => $("#bloque-" + b).classList.toggle("hidden", b !== cual));
+  ["datos", "tipo"].forEach((b) => $("#bloque-" + b).classList.toggle("hidden", b !== cual));
+}
+
+function precargarDatos() {
+  if (state.conductor) $("#input-conductor").value = state.conductor;
+  if (state.identificacion) $("#input-identificacion").value = state.identificacion;
+  if (state.placa) $("#input-placa").value = state.placa;
+}
+
+function mostrarTipoConductor() {
+  $("#inicio-nombre").textContent = state.conductor;
+  $("#inicio-placa").textContent = state.placa;
+  mostrarBloqueInicio("tipo");
 }
 
 function renderInicio() {
-  const completo = !!(state.conductor && state.identificacion && state.placa && state.tipo);
-  if (completo) {
-    $("#inicio-nombre").textContent = state.conductor;
-    $("#inicio-placa").textContent = state.placa;
-    mostrarBloqueInicio("guardado");
+  // Quien ya se registró ve directamente las dos opciones (permanente / ocasional);
+  // quien es nuevo (o tiene datos incompletos) completa primero sus datos.
+  if (state.conductor && state.identificacion && state.placa) {
+    mostrarTipoConductor();
   } else {
-    // Datos parciales (p. ej. de una versión anterior): se precargan para completarlos
-    if (state.conductor) $("#input-conductor").value = state.conductor;
-    if (state.identificacion) $("#input-identificacion").value = state.identificacion;
-    if (state.placa) $("#input-placa").value = state.placa;
+    precargarDatos();
     mostrarBloqueInicio("datos");
   }
   showView("view-inicio");
@@ -285,23 +291,17 @@ async function guardarDatos() {
     }
   }
   $("#btn-guardar-datos").textContent = "Continuar";
-  mostrarBloqueInicio("tipo");
+  mostrarTipoConductor();
 }
 
 function elegirTipo(tipo) {
-  state.tipo = tipo;
-  localStorage.setItem(STORAGE_KEYS.TIPO, tipo);
-  entrarSegunTipo();
-}
-
-function entrarSegunTipo() {
-  if (state.tipo === "ocasional") showView("view-ocasional");
+  if (tipo === "ocasional") showView("view-ocasional");
   else irAHome();
 }
 
 function cambiarConductor() {
   Object.values(STORAGE_KEYS).forEach((k) => { if (k !== STORAGE_KEYS.QUEUE) localStorage.removeItem(k); });
-  state.conductor = state.identificacion = state.placa = state.tipo = null;
+  state.conductor = state.identificacion = state.placa = null;
   renderInicio();
 }
 
@@ -516,7 +516,6 @@ document.addEventListener("DOMContentLoaded", () => {
   state.conductor = localStorage.getItem(STORAGE_KEYS.CONDUCTOR);
   state.identificacion = localStorage.getItem(STORAGE_KEYS.IDENTIFICACION);
   state.placa = localStorage.getItem(STORAGE_KEYS.PLACA);
-  state.tipo = localStorage.getItem(STORAGE_KEYS.TIPO);
   // Quien ya se registró vio antes la explicación: se actualiza la ubicación en silencio.
   // A quien es nuevo no se le pide nada hasta explicarle por qué.
   if (state.conductor) refrescarUbicacion();
@@ -536,14 +535,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // Validación del conductor: ocasional -> formulario, permanente -> menú
   $("#btn-guardar-datos").addEventListener("click", guardarDatos);
   $("#btn-activar-ubicacion").addEventListener("click", activarUbicacion);
-  $("#btn-editar-datos").addEventListener("click", () => mostrarBloqueInicio("datos"));
+  $("#btn-editar-datos").addEventListener("click", () => { precargarDatos(); mostrarBloqueInicio("datos"); });
   $("#btn-tipo-recurrente").addEventListener("click", () => elegirTipo("permanente"));
   $("#btn-tipo-ocasional").addEventListener("click", () => elegirTipo("ocasional"));
   $("#btn-volver-tipo").addEventListener("click", renderInicio);
   $("#btn-formulario-ocasional").href = VIALIX_CONFIG.URL_FORMULARIO_OCASIONAL;
   $("#btn-actualizar-datos").href = VIALIX_CONFIG.URL_ACTUALIZACION_DATOS;
-  $("#btn-entrar-guardado").addEventListener("click", entrarSegunTipo);
-  $("#btn-cambiar-guardado").addEventListener("click", cambiarConductor);
 
   $("#btn-cambiar-conductor").addEventListener("click", cambiarConductor);
 

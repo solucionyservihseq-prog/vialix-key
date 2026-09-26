@@ -445,3 +445,5 @@ p { line-height: 1.45; color: #555; }
 .estado-ubicacion { font-weight: 700; }
 .estado-ok { color: var(--verde-oscuro) !important; }
 .estado-alerta { color: var(--naranja) !important; }
+
+.resumen-conductor { background: var(--gris-bg); border-radius: 10px; padding: 10px 12px; }

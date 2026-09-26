@@ -64,6 +64,7 @@
 
       <!-- Paso 2: tipo de conductor -->
       <div id="bloque-tipo" class="hidden">
+        <p class="resumen-conductor">Conductor: <strong id="inicio-nombre">--</strong> · Placa: <strong id="inicio-placa">--</strong></p>
         <p>¿Qué tipo de conductor eres?</p>
         <button type="button" id="btn-tipo-recurrente" class="btn-accion btn-verde">
           <span class="btn-accion-icono">🔁</span>
@@ -76,12 +77,6 @@
         <button type="button" id="btn-editar-datos" class="btn-link">← Editar mis datos</button>
       </div>
 
-      <!-- Conductor ya registrado en este celular -->
-      <div id="bloque-guardado" class="hidden">
-        <p>Conductor: <strong id="inicio-nombre">--</strong><br>Placa: <strong id="inicio-placa">--</strong></p>
-        <button type="button" id="btn-entrar-guardado" class="btn-primario">Entrar a la aplicación</button>
-        <button type="button" id="btn-cambiar-guardado" class="btn-link">Cambiar mis datos o tipo de conductor</button>
-      </div>
     </div>
   </section>
 
@@ -99,7 +94,7 @@
   <!-- Home -->
   <section id="view-home" class="view">
     <div class="card home-card">
-      <p class="etiqueta">Cliente / piloto</p>
+      <p class="etiqueta">Grupo empresarial</p>
       <p class="valor" id="home-cliente">--</p>
       <p class="etiqueta">Conductor</p>
       <p class="valor" id="home-conductor">--</p>
