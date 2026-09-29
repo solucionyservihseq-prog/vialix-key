@@ -183,9 +183,44 @@
       <span>Fin de Recorrido</span>
     </button>
 
+    <button type="button" id="btn-riesgo-ruta" class="btn-accion btn-naranja">
+      <span class="btn-accion-icono">⚠️</span>
+      <span>Riesgo en Ruta</span>
+    </button>
+
     <p id="recorrido-estado" class="recorrido-estado hidden"></p>
 
     <button type="button" id="btn-volver-home-recorrido" class="btn-link">← Volver al inicio</button>
+  </section>
+
+  <!-- Riesgo en ruta (Resolución 40595 de 2022, ítem 15: identificación de riesgos en ruta) -->
+  <section id="view-riesgo-ruta" class="view">
+    <div class="card">
+      <h1>⚠️ Riesgo en ruta</h1>
+      <p>Identifica lo que puede generar riesgo en este tramo. Se tiene en cuenta para planificar los recorridos.</p>
+      <label class="campo">
+        Placa del vehículo (opcional)
+        <input type="text" id="riesgo-placa" placeholder="Ej: ABC123" style="text-transform:uppercase">
+      </label>
+      <label class="campo">
+        Tipo de riesgo
+        <select id="riesgo-tipo"></select>
+      </label>
+      <label class="campo">
+        Descripción (opcional)
+        <textarea id="riesgo-descripcion" placeholder="Ej: tramo destapado con huecos, cerca del colegio…"></textarea>
+      </label>
+    </div>
+
+    <p class="emergencia-pregunta">Nivel de riesgo</p>
+    <div class="nivel-riesgo-opciones">
+      <button type="button" id="btn-riesgo-alto" class="btn-nivel-riesgo btn-nivel-alto" data-nivel="Alto">Alto</button>
+      <button type="button" id="btn-riesgo-medio" class="btn-nivel-riesgo btn-nivel-medio" data-nivel="Medio">Medio</button>
+      <button type="button" id="btn-riesgo-bajo" class="btn-nivel-riesgo btn-nivel-bajo" data-nivel="Bajo">Bajo</button>
+    </div>
+
+    <button type="button" id="btn-enviar-riesgo" class="btn-primario" disabled>Guardar riesgo</button>
+    <button type="button" id="btn-cancelar-riesgo" class="btn-link">← Volver al recorrido</button>
   </section>
 
   <!-- Enviando -->

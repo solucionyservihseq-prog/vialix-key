@@ -447,3 +447,21 @@ p { line-height: 1.45; color: #555; }
 .estado-alerta { color: var(--naranja) !important; }
 
 .resumen-conductor { background: var(--gris-bg); border-radius: 10px; padding: 10px 12px; }
+
+/* Riesgo en ruta */
+.btn-naranja { background: var(--naranja); }
+.nivel-riesgo-opciones { display: flex; gap: 10px; margin-bottom: 16px; }
+.btn-nivel-riesgo {
+  flex: 1;
+  min-height: 60px;
+  border: 3px solid var(--gris-claro);
+  border-radius: var(--radio);
+  background: white;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #888;
+  cursor: pointer;
+}
+.btn-nivel-alto.seleccionado { background: var(--rojo); border-color: var(--rojo); color: white; }
+.btn-nivel-medio.seleccionado { background: var(--ambar); border-color: var(--ambar); color: white; }
+.btn-nivel-bajo.seleccionado { background: #1E9E4F; border-color: #1E9E4F; color: white; }

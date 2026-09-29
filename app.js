@@ -454,6 +454,64 @@ function irARecorrido() {
   showView("view-recorrido");
 }
 
+/* ---------- Riesgo en ruta (Resolución 40595/2022, ítem 15) ---------- */
+
+let nivelRiesgoSeleccionado = null;
+
+function irARiesgoRuta() {
+  const sel = $("#riesgo-tipo");
+  if (!sel.dataset.listo) {
+    sel.innerHTML = VIALIX_CONFIG.TIPOS_RIESGO_RUTA.map((t) => `<option value="${t}">${t}</option>`).join("");
+    sel.dataset.listo = "1";
+  }
+  $("#riesgo-placa").value = state.placa || "";
+  $("#riesgo-descripcion").value = "";
+  nivelRiesgoSeleccionado = null;
+  $all(".btn-nivel-riesgo").forEach((b) => b.classList.remove("seleccionado"));
+  $("#btn-enviar-riesgo").disabled = true;
+  showView("view-riesgo-ruta");
+}
+
+function elegirNivelRiesgo(boton) {
+  nivelRiesgoSeleccionado = boton.dataset.nivel;
+  $all(".btn-nivel-riesgo").forEach((b) => b.classList.remove("seleccionado"));
+  boton.classList.add("seleccionado");
+  $("#btn-enviar-riesgo").disabled = false;
+}
+
+async function enviarRiesgoRuta() {
+  if (!nivelRiesgoSeleccionado) return;
+  const boton = $("#btn-enviar-riesgo");
+  boton.disabled = true;
+  boton.textContent = "Guardando…";
+
+  const placa = $("#riesgo-placa").value.trim().toUpperCase();
+  const geo = await getGeo();
+  const payload = {
+    tipo: "riesgo_ruta",
+    timestamp: nowISO(),
+    placa: placa,
+    conductor: state.conductor,
+    identificacion: state.identificacion,
+    tipo_riesgo: $("#riesgo-tipo").value,
+    nivel: nivelRiesgoSeleccionado,
+    descripcion: $("#riesgo-descripcion").value.trim(),
+    lat: geo ? geo.lat : "",
+    lng: geo ? geo.lng : ""
+  };
+
+  const resultado = await sendToBackend(payload);
+  actualizarBadgeCola();
+
+  boton.disabled = false;
+  boton.textContent = "Guardar riesgo";
+
+  const estado = $("#recorrido-estado");
+  estado.textContent = `Riesgo "${payload.tipo_riesgo}" (${payload.nivel}) registrado${resultado.offline ? " — pendiente por sincronizar" : ""}.`;
+  estado.classList.remove("hidden");
+  showView("view-recorrido");
+}
+
 async function registrarRecorrido(tipo, boton) {
   const textoOriginal = boton.querySelector("span:last-child").textContent;
   boton.disabled = true;
@@ -565,6 +623,11 @@ document.addEventListener("DOMContentLoaded", () => {
   $("#btn-recorrido-inicio").addEventListener("click", (e) => registrarRecorrido("inicio", e.currentTarget));
   $("#btn-recorrido-gestion").addEventListener("click", (e) => registrarRecorrido("gestion", e.currentTarget));
   $("#btn-recorrido-fin").addEventListener("click", (e) => registrarRecorrido("fin", e.currentTarget));
+
+  $("#btn-riesgo-ruta").addEventListener("click", irARiesgoRuta);
+  $("#btn-cancelar-riesgo").addEventListener("click", () => showView("view-recorrido"));
+  $all(".btn-nivel-riesgo").forEach((b) => b.addEventListener("click", () => elegirNivelRiesgo(b)));
+  $("#btn-enviar-riesgo").addEventListener("click", enviarRiesgoRuta);
 
   window.addEventListener("online", reintentarCola);
   reintentarCola();

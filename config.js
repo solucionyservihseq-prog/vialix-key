@@ -28,6 +28,22 @@ const VIALIX_CONFIG = {
   // Formulario donde se actualizan los datos del conductor y del vehículo.
   URL_ACTUALIZACION_DATOS: "https://forms.cloud.microsoft/r/G5tLKUcFH7",
 
+  // Tipos de riesgo en ruta (botón "Riesgo en Ruta" del Registro de recorrido).
+  // Da cumplimiento al ítem 15 de la Resolución 40595 de 2022 (identificación
+  // de peligros en la ruta). Agrega, quita o edita libremente.
+  TIPOS_RIESGO_RUTA: [
+    "Estado de la vía (huecos, destapada, derrumbe)",
+    "Alta accidentalidad en la zona",
+    "Clima adverso (lluvia, niebla, inundación)",
+    "Congestión / tráfico pesado",
+    "Zona escolar / alta circulación de peatones",
+    "Obra en vía / cierre parcial",
+    "Presencia de animales en la vía",
+    "Iluminación deficiente",
+    "Zona de orden público / inseguridad",
+    "Otro"
+  ],
+
   // Duración sugerida del ejercicio de respiración (segundos)
   DURACION_ENFOQUE_MENTAL: 45,
 
