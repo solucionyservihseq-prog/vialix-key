@@ -299,6 +299,18 @@ function elegirTipo(tipo) {
   else irAHome();
 }
 
+// Prueba teórico-práctica: parte teórica (formulario) y práctica (HEADSENSE)
+function irAPrueba() {
+  $("#prueba-nombre").textContent = state.conductor || "--";
+  $("#prueba-placa").textContent = state.placa || "--";
+  const urlEval = VIALIX_CONFIG.URL_EVALUACION_CONOCIMIENTO;
+  $("#btn-evaluacion-conocimiento").classList.toggle("hidden", !urlEval);
+  $("#evaluacion-pendiente").classList.toggle("hidden", !!urlEval);
+  if (urlEval) $("#btn-evaluacion-conocimiento").href = urlEval;
+  $("#btn-headsense").href = VIALIX_CONFIG.URL_HEADSENSE;
+  showView("view-prueba");
+}
+
 function cambiarConductor() {
   Object.values(STORAGE_KEYS).forEach((k) => { if (k !== STORAGE_KEYS.QUEUE) localStorage.removeItem(k); });
   state.conductor = state.identificacion = state.placa = null;
@@ -597,6 +609,8 @@ document.addEventListener("DOMContentLoaded", () => {
   $("#btn-tipo-recurrente").addEventListener("click", () => elegirTipo("permanente"));
   $("#btn-tipo-ocasional").addEventListener("click", () => elegirTipo("ocasional"));
   $("#btn-volver-tipo").addEventListener("click", renderInicio);
+  $("#btn-iniciar-prueba").addEventListener("click", irAPrueba);
+  $("#btn-volver-prueba").addEventListener("click", renderInicio);
   $("#btn-formulario-ocasional").href = VIALIX_CONFIG.URL_FORMULARIO_OCASIONAL;
   $("#btn-actualizar-datos").href = VIALIX_CONFIG.URL_ACTUALIZACION_DATOS;
 

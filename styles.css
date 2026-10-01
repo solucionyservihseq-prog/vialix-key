@@ -374,6 +374,15 @@ p { line-height: 1.45; color: #555; }
 }
 .btn-gigante-naranja { background: var(--naranja); }
 .btn-gigante-azul { background: var(--azul); }
+.btn-gigante-morado { background: var(--morado); }
+.texto-ayuda { font-size: 0.9rem; color: #5A6660; }
+
+/* Pregunta de la prueba teórico-práctica, separada del tipo de conductor */
+.bloque-prueba {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #E2E6E4;
+}
 
 /* ===== Pantalla inicial: botón rojo de emergencias ===== */
 .btn-emergencias-viales {

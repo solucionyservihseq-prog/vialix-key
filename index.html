@@ -74,6 +74,16 @@
           <span class="btn-accion-icono">🕐</span>
           <span>Conductor ocasional</span>
         </button>
+
+        <!-- Prueba teórico-práctica de conducción (v1.5.0) -->
+        <div class="bloque-prueba">
+          <p>¿Deseas iniciar la prueba teórico-práctica de conducción?</p>
+          <button type="button" id="btn-iniciar-prueba" class="btn-accion btn-morado">
+            <span class="btn-accion-icono">🎓</span>
+            <span>Iniciar prueba teórico-práctica</span>
+          </button>
+        </div>
+
         <button type="button" id="btn-editar-datos" class="btn-link">← Editar mis datos</button>
       </div>
 
@@ -88,6 +98,20 @@
       <a id="btn-formulario-ocasional" class="btn-gigante" target="_blank" rel="noopener">📝 Solicitud autorización desplazamiento laboral ocasional</a>
       <a id="btn-actualizar-datos" class="btn-gigante btn-gigante-azul" target="_blank" rel="noopener">🔄 Actualización de datos conductor y vehículo</a>
       <button type="button" id="btn-volver-tipo" class="btn-link">← Volver</button>
+    </div>
+  </section>
+
+  <!-- Prueba teórico-práctica: evaluación de conocimiento + VIALIX HEADSENSE -->
+  <section id="view-prueba" class="view">
+    <div class="card centrado">
+      <h1>Prueba teórico-práctica de conducción</h1>
+      <p class="resumen-conductor">Conductor: <strong id="prueba-nombre">--</strong> · Placa: <strong id="prueba-placa">--</strong></p>
+      <p>Realiza las dos partes. Cada una se abre en una pestaña nueva.</p>
+      <a id="btn-evaluacion-conocimiento" class="btn-gigante btn-gigante-azul" target="_blank" rel="noopener">📝 1. Evaluación de conocimiento</a>
+      <p id="evaluacion-pendiente" class="texto-ayuda hidden">La evaluación de conocimiento aún no está configurada. Consulta con tu responsable SST.</p>
+      <a id="btn-headsense" class="btn-gigante btn-gigante-morado" target="_blank" rel="noopener">🎯 2. Prueba práctica · VIALIX HEADSENSE</a>
+      <p class="texto-ayuda">En la prueba práctica el celular va sujeto a la cabeza (casco, diadema o gorra) y mide tus movimientos mientras conduces: revisión de espejos, posturas y señales de fatiga.</p>
+      <button type="button" id="btn-volver-prueba" class="btn-link">← Volver</button>
     </div>
   </section>
 

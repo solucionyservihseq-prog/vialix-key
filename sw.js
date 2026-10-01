@@ -1,4 +1,7 @@
-const CACHE_NAME = "vialix-key-v16";
+// Prefijo propio: solo se borran cachés de VIALIX KEY, nunca los de otras
+// apps publicadas en el mismo dominio github.io (p. ej. VIALIX HEADSENSE).
+const CACHE_PREFIJO = "vialix-key-v";
+const CACHE_NAME = CACHE_PREFIJO + "18";
 const ASSETS = [
   "./",
   "./index.html",
@@ -27,7 +30,7 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+      Promise.all(keys.filter((k) => k.startsWith(CACHE_PREFIJO) && k !== CACHE_NAME).map((k) => caches.delete(k)))
     )
   );
   self.clients.claim();
