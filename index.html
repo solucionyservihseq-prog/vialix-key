@@ -9,6 +9,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="pruebas.css">
 </head>
 <body>
 
@@ -106,14 +107,251 @@
     <div class="card centrado">
       <h1>Prueba teórico-práctica de conducción</h1>
       <p class="resumen-conductor">Conductor: <strong id="prueba-nombre">--</strong> · Placa: <strong id="prueba-placa">--</strong></p>
-      <p>Realiza las tres partes. Cada una se abre en una pestaña nueva.</p>
-      <a id="btn-evaluacion-conocimiento" class="btn-gigante btn-gigante-azul" target="_blank" rel="noopener">📝 1. Evaluación de conocimiento</a>
-      <p id="evaluacion-pendiente" class="texto-ayuda hidden">La evaluación de conocimiento aún no está configurada. Consulta con tu responsable SST.</p>
-      <a id="btn-headsense" class="btn-gigante btn-gigante-morado" target="_blank" rel="noopener">🎯 2. Prueba práctica · VIALIX HEADSENSE</a>
-      <p class="texto-ayuda">En la prueba práctica el celular va sujeto a la cabeza (casco, diadema o gorra) y mide tus movimientos mientras conduces: revisión de espejos, posturas y señales de fatiga.</p>
-      <a id="btn-psicotest" class="btn-gigante btn-gigante-naranja" target="_blank" rel="noopener">🧠 3. Pruebas psicomotrices</a>
-      <p class="texto-ayuda">Tres pruebas en la pantalla del celular: tiempos de reacción, coordinación de las dos manos y anticipación de la velocidad. Hazlas sentado y sin conducir.</p>
+      <p>Realiza las tres partes. Todo queda guardado y al final de cada una verás recomendaciones.</p>
+      <button type="button" id="btn-ir-teorica" class="btn-gigante btn-gigante-azul">📝 1. Evaluación de conocimiento</button>
+      <p id="estado-teorica" class="estado-parte">Pendiente</p>
+      <button type="button" id="btn-ir-headsense" class="btn-gigante btn-gigante-morado">🎯 2. Prueba práctica · VIALIX HEADSENSE</button>
+      <p id="estado-headsense" class="estado-parte">Pendiente</p>
+      <p class="texto-ayuda">El celular va sujeto a la cabeza (casco, diadema o gorra) y mide tus movimientos mientras conduces: revisión de espejos, posturas y señales de fatiga.</p>
+      <button type="button" id="btn-ir-psicotest" class="btn-gigante btn-gigante-naranja">🧠 3. Pruebas psicomotrices</button>
+      <p id="estado-psicotest" class="estado-parte">Pendiente</p>
+      <p class="texto-ayuda">Tiempos de reacción, coordinación de las dos manos y anticipación de la velocidad. Hazlas sentado y sin conducir.</p>
       <button type="button" id="btn-volver-prueba" class="btn-link">← Volver</button>
+    </div>
+  </section>
+
+  <!-- ======================================================
+       Prueba teórico-práctica (v1.7.0): todo dentro de VIALIX KEY
+       ====================================================== -->
+
+  <!-- 1. Evaluación teórica: inicio -->
+  <section id="view-teorica-intro" class="view">
+    <div class="card">
+      <h1>📝 Evaluación de conocimiento</h1>
+      <p><span id="teo-total">20</span> preguntas de selección múltiple sobre normas de tránsito, conducción preventiva y el PESV. Cada pregunta tiene una sola respuesta correcta.</p>
+      <ul class="instr-lista">
+        <li>Lee con calma; puedes volver a la pregunta anterior antes de terminar.</li>
+        <li>Se aprueba con <strong><span id="teo-aprobacion">80</span>%</strong> o más.</li>
+        <li>Al final verás tu calificación, las preguntas a repasar y recomendaciones por tema.</li>
+      </ul>
+      <p id="teo-ultimo" class="texto-ayuda hidden"></p>
+      <button type="button" id="btn-teo-comenzar" class="btn-primario">Comenzar evaluación</button>
+      <button type="button" id="btn-teo-volver" class="btn-link">← Volver</button>
+    </div>
+  </section>
+
+  <!-- 1. Evaluación teórica: pregunta -->
+  <section id="view-teorica-pregunta" class="view">
+    <div class="card">
+      <p id="teo-progreso-texto" class="etiqueta">Pregunta 1 de 20</p>
+      <div class="teo-progreso"><span id="teo-progreso-barra"></span></div>
+      <h2 id="teo-enunciado" class="teo-enunciado">--</h2>
+      <div id="teo-opciones" class="teo-opciones"></div>
+      <button type="button" id="btn-teo-siguiente" class="btn-primario" disabled>Siguiente →</button>
+      <button type="button" id="btn-teo-anterior" class="btn-secundario hidden">← Anterior</button>
+      <button type="button" id="btn-teo-salir" class="btn-link">Salir de la evaluación</button>
+    </div>
+  </section>
+
+  <!-- 1. Evaluación teórica: resultado -->
+  <section id="view-teorica-resultado" class="view">
+    <div class="card">
+      <h1>📝 Resultado de la evaluación</h1>
+      <div id="teo-nivel" class="nivel">--</div>
+      <p id="teo-detalle" class="centrado">--</p>
+      <div id="teo-recomendaciones"></div>
+      <div id="teo-repaso"></div>
+      <p id="teo-envio" class="estado-envio">--</p>
+      <button type="button" id="btn-teo-fin" class="btn-primario">Continuar con la prueba</button>
+      <button type="button" id="btn-teo-repetir" class="btn-secundario">↻ Repetir evaluación</button>
+    </div>
+  </section>
+
+  <!-- 2. Prueba práctica HEADSENSE: preparar -->
+  <section id="view-hs-preparar" class="view">
+    <div class="card">
+      <h1>🎯 Prueba práctica · HEADSENSE</h1>
+      <ol class="pasos">
+        <li>Sujeta el celular <strong>en vertical</strong> a la cabeza (diadema, gorra o casco) de modo que no se mueva ni se deslice.</li>
+        <li>Deja la pantalla hacia afuera y baja el brillo.</li>
+        <li>Al calibrar, mira al frente en tu postura normal, sin moverte, durante 3 segundos.</li>
+      </ol>
+      <fieldset class="campo opciones">
+        <legend>¿Dónde va el celular?</legend>
+        <label><input type="radio" name="hs-montaje" value="frente" checked> En la frente / parte delantera del casco</label>
+        <label><input type="radio" name="hs-montaje" value="nuca"> En la nuca / parte trasera del casco</label>
+      </fieldset>
+      <label class="campo">Recorrido o actividad (opcional)
+        <input type="text" id="hs-etiqueta" placeholder="Ej: Ruta de prueba, patio de maniobras">
+      </label>
+      <label class="campo">Placa del vehículo
+        <input type="text" id="hs-placa" placeholder="Ej: ABC123" style="text-transform:uppercase">
+      </label>
+      <label class="check">
+        <input type="checkbox" id="hs-demo">
+        Modo demostración (datos simulados, para probar sin giroscopio)
+      </label>
+      <p id="hs-error" class="error hidden"></p>
+      <button type="button" id="btn-hs-activar" class="btn-primario">Activar sensores y calibrar</button>
+      <button type="button" id="btn-hs-historial" class="btn-secundario">🗂️ Mediciones guardadas</button>
+      <p id="hs-pendientes" class="cola-info hidden"></p>
+      <button type="button" id="btn-hs-volver" class="btn-link">← Volver</button>
+    </div>
+  </section>
+
+  <!-- 2. HEADSENSE: calibrar -->
+  <section id="view-hs-calibrar" class="view">
+    <div class="card centrado">
+      <div class="resultado-icono azul">🎯</div>
+      <h1>Calibrando</h1>
+      <p id="hs-calibrar-texto">Mira al frente y quédate quieto…</p>
+      <div class="progreso"><span id="hs-calibrar-progreso"></span></div>
+      <button type="button" id="btn-hs-cancelar-calib" class="btn-link">Cancelar</button>
+    </div>
+  </section>
+
+  <!-- 2. HEADSENSE: medición en vivo -->
+  <section id="view-hs-medir" class="view">
+    <div class="card medir-cabecera">
+      <div>
+        <p class="etiqueta">Grabando <span class="punto-rec"></span></p>
+        <p class="medir-tiempo" id="hs-medir-tiempo">00:00</p>
+        <p id="hs-medir-demo" class="pildora nivel-medio hidden">Modo demostración</p>
+      </div>
+      <svg class="cabeza" viewBox="0 0 200 110" aria-hidden="true">
+        <g id="hs-cabeza-frente">
+          <ellipse cx="50" cy="50" rx="26" ry="32" class="cabeza-cara"/>
+          <circle cx="26" cy="52" r="5" class="cabeza-cara"/>
+          <circle cx="74" cy="52" r="5" class="cabeza-cara"/>
+          <g id="hs-cabeza-nariz">
+            <circle cx="41" cy="44" r="3" class="cabeza-rasgo"/>
+            <circle cx="59" cy="44" r="3" class="cabeza-rasgo"/>
+            <path d="M50 48 L46 60 L54 60 Z" class="cabeza-rasgo"/>
+          </g>
+        </g>
+        <rect x="40" y="82" width="20" height="18" rx="4" class="cabeza-cuello"/>
+        <g id="hs-cabeza-lado">
+          <ellipse cx="148" cy="46" rx="30" ry="30" class="cabeza-cara"/>
+          <path d="M176 44 L186 52 L176 56 Z" class="cabeza-rasgo"/>
+          <circle cx="164" cy="38" r="3" class="cabeza-rasgo"/>
+        </g>
+        <rect x="140" y="72" width="20" height="28" rx="4" class="cabeza-cuello"/>
+        <text x="50" y="108" text-anchor="middle" class="cabeza-texto">frente</text>
+        <text x="150" y="108" text-anchor="middle" class="cabeza-texto">perfil</text>
+      </svg>
+    </div>
+    <div class="vivo">
+      <div class="vivo-eje" id="vivo-flexion">
+        <span class="vivo-nombre">Flexión <small>+ abajo / − atrás</small></span>
+        <span class="vivo-valor">0°</span>
+        <span class="vivo-barra"><span></span></span>
+      </div>
+      <div class="vivo-eje" id="vivo-rotacion">
+        <span class="vivo-nombre">Rotación <small>+ izq / − der</small></span>
+        <span class="vivo-valor">0°</span>
+        <span class="vivo-barra"><span></span></span>
+      </div>
+      <div class="vivo-eje" id="vivo-inclinacion">
+        <span class="vivo-nombre">Inclinación <small>+ der / − izq</small></span>
+        <span class="vivo-valor">0°</span>
+        <span class="vivo-barra"><span></span></span>
+      </div>
+    </div>
+    <div class="kpis kpis-vivo">
+      <div class="kpi"><span class="kpi-valor" id="hs-giros">0</span><span class="kpi-nombre">Giros</span></div>
+      <div class="kpi"><span class="kpi-valor" id="hs-cabeceos">0</span><span class="kpi-nombre">Cabeceos</span></div>
+      <div class="kpi"><span class="kpi-valor" id="hs-riesgo">0%</span><span class="kpi-nombre">En riesgo</span></div>
+    </div>
+    <div class="card">
+      <h2>Últimos 30 segundos</h2>
+      <div class="leyenda">
+        <span><i style="background:var(--serie-flexion)"></i>Flexión</span>
+        <span><i style="background:var(--serie-rotacion)"></i>Rotación</span>
+        <span><i style="background:var(--serie-inclinacion)"></i>Inclinación</span>
+      </div>
+      <canvas id="hs-grafica" class="grafica"></canvas>
+    </div>
+    <p class="ayuda centrado">Mantén la pantalla encendida y la app abierta mientras se mide.</p>
+    <button type="button" id="btn-hs-recentrar" class="btn-secundario">🎯 Recentrar rotación (mirando al frente)</button>
+    <button type="button" id="btn-hs-detener" class="btn-accion btn-rojo">
+      <span class="btn-accion-icono">⏹️</span>
+      <span>Detener y analizar</span>
+    </button>
+  </section>
+
+  <!-- 2. HEADSENSE: guardando -->
+  <section id="view-hs-enviando" class="view">
+    <div class="card centrado">
+      <div class="spinner"></div>
+      <p>Analizando y guardando la medición…</p>
+    </div>
+  </section>
+
+  <!-- 2. HEADSENSE: resultado -->
+  <section id="view-hs-resultado" class="view">
+    <p id="hs-resultado-estado" class="estado-sync"></p>
+    <div id="hs-resultado-contenido"></div>
+    <div class="acciones-fila">
+      <button type="button" id="btn-hs-csv" class="btn-primario">⬇️ Descargar CSV</button>
+      <button type="button" id="btn-hs-borrar" class="btn-secundario">🗑️ Borrar</button>
+    </div>
+    <button type="button" id="btn-hs-fin" class="btn-link">← Volver a la prueba teórico-práctica</button>
+  </section>
+
+  <!-- 2. HEADSENSE: historial -->
+  <section id="view-hs-historial" class="view">
+    <div class="checklist-header"><h1>Mediciones guardadas</h1></div>
+    <div id="hs-historial-lista" class="historial-lista"></div>
+    <button type="button" id="btn-hs-historial-volver" class="btn-link">← Volver</button>
+  </section>
+
+  <!-- 3. Pruebas psicomotrices: menú -->
+  <section id="view-pt-home" class="view">
+    <div class="card">
+      <h1>🧠 Pruebas psicomotrices</h1>
+      <p>Tres pruebas cortas en la pantalla del celular. Hazlas en orden y sin prisa.</p>
+      <p class="aviso-prueba"><strong>Antes de empezar:</strong> siéntate, sube el brillo, silencia las notificaciones y quita fundas o anillos que estorben. No las hagas mientras conduces.</p>
+    </div>
+    <div id="pt-lista"></div>
+    <button type="button" id="btn-pt-resumen" class="btn-accion btn-azul">
+      <span class="btn-accion-icono">📋</span>
+      <span>Ver resumen y recomendaciones</span>
+    </button>
+    <button type="button" id="btn-pt-volver" class="btn-link">← Volver</button>
+  </section>
+
+  <!-- 3. Psicomotrices: instrucciones -->
+  <section id="view-pt-instr" class="view">
+    <div class="card">
+      <h1 id="pt-instr-titulo">--</h1>
+      <ol id="pt-instr-lista" class="instr-lista"></ol>
+      <p id="pt-instr-horizontal" class="aviso-prueba hidden">📱↔️ Esta prueba se hace con el celular en <strong>horizontal</strong>.</p>
+      <button type="button" id="btn-pt-comenzar" class="btn-primario">Comenzar</button>
+      <button type="button" id="btn-pt-volver-instr" class="btn-link">← Volver</button>
+    </div>
+  </section>
+
+  <!-- 3. Psicomotrices: resultado -->
+  <section id="view-pt-resultado" class="view">
+    <div class="card">
+      <h1 id="pt-res-titulo">--</h1>
+      <div id="pt-res-nivel" class="nivel">--</div>
+      <div id="pt-res-recomendaciones"></div>
+      <div id="pt-res-tabla" class="res-tabla"></div>
+      <p id="pt-res-envio" class="estado-envio">--</p>
+      <button type="button" id="btn-pt-siguiente" class="btn-primario">Siguiente prueba</button>
+      <button type="button" id="btn-pt-repetir" class="btn-secundario">↻ Repetir esta prueba</button>
+      <button type="button" id="btn-pt-res-menu" class="btn-link">← Volver al menú</button>
+    </div>
+  </section>
+
+  <!-- 3. Psicomotrices: resumen -->
+  <section id="view-pt-resumen" class="view">
+    <div class="card">
+      <h1>Resumen de pruebas psicomotrices</h1>
+      <div id="pt-resumen-contenido"></div>
+      <p class="texto-ayuda">Estas pruebas son un tamizaje de entrenamiento: no reemplazan el examen de aptitud de un Centro de Reconocimiento de Conductores (CRC).</p>
+      <button type="button" id="btn-pt-resumen-volver" class="btn-link">← Volver al menú</button>
     </div>
   </section>
 
@@ -354,7 +592,24 @@
   </div>
 </div>
 
+<!-- Área de las pruebas psicomotrices a pantalla completa -->
+<div id="pt-arena" class="arena hidden">
+  <canvas id="pt-lienzo"></canvas>
+  <button type="button" id="btn-pt-salir" class="arena-salir" aria-label="Salir de la prueba">✕</button>
+  <div id="pt-cuenta" class="arena-cuenta hidden">3</div>
+</div>
+
 <script src="config.js"></script>
+<script src="config-pruebas.js"></script>
+<script src="teorica-banco.js"></script>
+<script src="hs-sensor.js"></script>
+<script src="hs-analisis.js"></script>
+<script src="hs-almacen.js"></script>
+<script src="pt-pruebas.js"></script>
 <script src="app.js"></script>
+<script src="mod-comun.js"></script>
+<script src="mod-teorica.js"></script>
+<script src="mod-psicotest.js"></script>
+<script src="mod-headsense.js"></script>
 </body>
 </html>

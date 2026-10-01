@@ -25,16 +25,10 @@ const VIALIX_CONFIG = {
   // Formulario que debe diligenciar el conductor OCASIONAL (no ve el menú de la app).
   URL_FORMULARIO_OCASIONAL: "https://forms.cloud.microsoft/r/tfXVmkXqfx",
 
-  // Prueba teórico-práctica de conducción (botón del inicio, v1.5.0).
-  // Parte teórica: formulario de evaluación de conocimiento.
-  // Mientras esté vacío (""), el botón se oculta y se muestra un aviso.
-  URL_EVALUACION_CONOCIMIENTO: "https://forms.cloud.microsoft/r/cw6Qu30BjM",
-  // Parte práctica: app VIALIX HEADSENSE. Está en el mismo usuario de GitHub
-  // Pages, así que recibe el nombre, la cédula y la placa del conductor.
-  URL_HEADSENSE: "https://solucionyservihseq-prog.github.io/vialix-headsense-v2/",
-  // Pruebas psicomotrices (v1.6.0): app VIALIX PSICOTEST, también recibe los
-  // datos del conductor. Déjalo vacío ("") para ocultar el botón.
-  URL_PSICOTEST: "https://solucionyservihseq-prog.github.io/vialix-psicotest/",
+  // Prueba teórico-práctica de conducción (botón del inicio).
+  // Desde v1.7.0 las tres partes están DENTRO de la app; su configuración
+  // (preguntas, umbrales y backends de resultados) está en config-pruebas.js
+  // y teorica-banco.js.
 
   // Formulario donde se actualizan los datos del conductor y del vehículo.
   URL_ACTUALIZACION_DATOS: "https://forms.cloud.microsoft/r/G5tLKUcFH7",

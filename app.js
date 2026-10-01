@@ -299,19 +299,30 @@ function elegirTipo(tipo) {
   else irAHome();
 }
 
-// Prueba teórico-práctica: parte teórica (formulario) y práctica (HEADSENSE)
-function irAPrueba() {
+// Prueba teórico-práctica (v1.7.0): las tres partes están dentro de la app
+// (mod-teorica.js, mod-headsense.js, mod-psicotest.js). Aquí se muestra el
+// estado de cada una para el conductor actual.
+async function irAPrueba() {
   $("#prueba-nombre").textContent = state.conductor || "--";
   $("#prueba-placa").textContent = state.placa || "--";
-  const urlEval = VIALIX_CONFIG.URL_EVALUACION_CONOCIMIENTO;
-  $("#btn-evaluacion-conocimiento").classList.toggle("hidden", !urlEval);
-  $("#evaluacion-pendiente").classList.toggle("hidden", !!urlEval);
-  if (urlEval) $("#btn-evaluacion-conocimiento").href = urlEval;
-  $("#btn-headsense").href = VIALIX_CONFIG.URL_HEADSENSE;
-  const urlPsico = VIALIX_CONFIG.URL_PSICOTEST;
-  $("#btn-psicotest").classList.toggle("hidden", !urlPsico);
-  if (urlPsico) $("#btn-psicotest").href = urlPsico;
   showView("view-prueba");
+
+  const ultimos = PruebasComun.ultimos();
+  const estado = (el, texto, ok) => {
+    el.textContent = texto;
+    el.className = `estado-parte ${ok === true ? "ok" : ok === false ? "alerta" : ""}`;
+  };
+  const t = ultimos.teorica;
+  estado($("#estado-teorica"), t ? `${t.resumen.dentro_referencia ? "✓ Aprobada" : "No aprobada"} · ${t.resumen.puntaje_pct}%` : "Pendiente", t ? t.resumen.dentro_referencia : null);
+  const hechas = ["reaccion", "bimanual", "anticipacion"].filter((id) => ultimos[id]);
+  const bien = hechas.filter((id) => ultimos[id].resumen.dentro_referencia).length;
+  estado($("#estado-psicotest"), hechas.length ? `${hechas.length} de 3 realizadas · ${bien} dentro de referencia` : "Pendiente", hechas.length === 3 ? bien === 3 : null);
+  try {
+    const hs = await ModHeadsense.ultimo();
+    estado($("#estado-headsense"), hs ? `Última medición: ${new Date(hs.inicio).toLocaleDateString()} · ${hs.metricas ? hs.metricas.pct_riesgo + "% en postura de riesgo" : ""}` : "Pendiente", null);
+  } catch (e) {
+    estado($("#estado-headsense"), "Pendiente", null);
+  }
 }
 
 function cambiarConductor() {
@@ -613,6 +624,9 @@ document.addEventListener("DOMContentLoaded", () => {
   $("#btn-tipo-ocasional").addEventListener("click", () => elegirTipo("ocasional"));
   $("#btn-volver-tipo").addEventListener("click", renderInicio);
   $("#btn-iniciar-prueba").addEventListener("click", irAPrueba);
+  $("#btn-ir-teorica").addEventListener("click", () => ModTeorica.abrir());
+  $("#btn-ir-headsense").addEventListener("click", () => ModHeadsense.abrir());
+  $("#btn-ir-psicotest").addEventListener("click", () => ModPsicotest.abrir());
   $("#btn-volver-prueba").addEventListener("click", renderInicio);
   $("#btn-formulario-ocasional").href = VIALIX_CONFIG.URL_FORMULARIO_OCASIONAL;
   $("#btn-actualizar-datos").href = VIALIX_CONFIG.URL_ACTUALIZACION_DATOS;
@@ -662,6 +676,17 @@ document.addEventListener("DOMContentLoaded", () => {
     navigator.serviceWorker.addEventListener("controllerchange", () => {
       if (recargando) return;
       recargando = true;
+      // No recargar en plena prueba o medición: se perderían los datos.
+      // La versión nueva se carga al terminar (o la próxima vez que se abra).
+      if (window.VIALIX_PRUEBA_EN_CURSO) {
+        const esperar = setInterval(() => {
+          if (!window.VIALIX_PRUEBA_EN_CURSO) {
+            clearInterval(esperar);
+            window.location.reload();
+          }
+        }, 2000);
+        return;
+      }
       window.location.reload();
     });
   }
