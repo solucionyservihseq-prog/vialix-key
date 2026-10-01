@@ -308,6 +308,9 @@ function irAPrueba() {
   $("#evaluacion-pendiente").classList.toggle("hidden", !!urlEval);
   if (urlEval) $("#btn-evaluacion-conocimiento").href = urlEval;
   $("#btn-headsense").href = VIALIX_CONFIG.URL_HEADSENSE;
+  const urlPsico = VIALIX_CONFIG.URL_PSICOTEST;
+  $("#btn-psicotest").classList.toggle("hidden", !urlPsico);
+  if (urlPsico) $("#btn-psicotest").href = urlPsico;
   showView("view-prueba");
 }
 

@@ -32,6 +32,9 @@ const VIALIX_CONFIG = {
   // Parte práctica: app VIALIX HEADSENSE. Está en el mismo usuario de GitHub
   // Pages, así que recibe el nombre, la cédula y la placa del conductor.
   URL_HEADSENSE: "https://solucionyservihseq-prog.github.io/vialix-headsense-v2/",
+  // Pruebas psicomotrices (v1.6.0): app VIALIX PSICOTEST, también recibe los
+  // datos del conductor. Déjalo vacío ("") para ocultar el botón.
+  URL_PSICOTEST: "https://solucionyservihseq-prog.github.io/vialix-psicotest/",
 
   // Formulario donde se actualizan los datos del conductor y del vehículo.
   URL_ACTUALIZACION_DATOS: "https://forms.cloud.microsoft/r/G5tLKUcFH7",
