@@ -158,7 +158,7 @@ const ModTelemetria = (() => {
       fin: null,
       usuario: state.conductor || "",
       identificacion: state.identificacion || "",
-      etiqueta: $("#telb-etiqueta").value.trim() || "Tamizaje preventivo",
+      etiqueta: $("#telb-etiqueta").value.trim() || "Prueba preventiva",
       placa: $("#telb-placa").value.trim().toUpperCase(),
       tipo_vehiculo: b.vehiculo.id,
       perfil: "B",

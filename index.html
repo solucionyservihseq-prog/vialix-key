@@ -79,11 +79,12 @@
 
         <!-- Tamizaje preventivo de seguridad vial (v1.9.0: vigencia anual por identificación) -->
         <div class="bloque-prueba">
-          <p id="tamizaje-estado" class="tamizaje-estado">Verificando tu tamizaje preventivo…</p>
+          <p id="tamizaje-estado" class="tamizaje-estado">Verificando tu prueba preventiva…</p>
           <button type="button" id="btn-iniciar-prueba" class="btn-accion btn-morado hidden">
             <span class="btn-accion-icono">🎓</span>
-            <span id="tamizaje-boton-texto">Iniciar tamizaje</span>
+            <span id="tamizaje-boton-texto">Prueba de Biotelemetría en Conducción</span>
           </button>
+          <p id="tamizaje-aviso-guia" class="aviso-guia hidden">Esta herramienta genera indicadores orientativos para gestión en seguridad vial. No reemplaza la valoración de un profesional de la salud, ni prueba de conducción.</p>
         </div>
 
         <button type="button" id="btn-editar-datos" class="btn-link">← Editar mis datos</button>
@@ -106,7 +107,7 @@
   <!-- Tamizaje preventivo de seguridad vial: conocimiento, práctica y psicomotrices -->
   <section id="view-prueba" class="view">
     <div class="card centrado">
-      <h1>Tamizaje preventivo de seguridad vial</h1>
+      <h1>Prueba preventiva de seguridad vial</h1>
       <p class="resumen-conductor">Conductor: <strong id="prueba-nombre">--</strong> · Placa: <strong id="prueba-placa">--</strong></p>
       <p id="prueba-vigencia" class="tamizaje-estado">Verificando vigencia…</p>
       <p>Realiza las tres partes una vez al año. Todo queda guardado y al final de cada una verás recomendaciones.</p>
@@ -165,7 +166,7 @@
       <div id="teo-recomendaciones"></div>
       <div id="teo-repaso"></div>
       <p id="teo-envio" class="estado-envio">--</p>
-      <button type="button" id="btn-teo-fin" class="btn-primario">Continuar con el tamizaje</button>
+      <button type="button" id="btn-teo-fin" class="btn-primario">Continuar con la prueba</button>
       <button type="button" id="btn-teo-repetir" class="btn-secundario">↻ Repetir evaluación</button>
     </div>
   </section>
@@ -298,7 +299,7 @@
       <button type="button" id="btn-hs-csv" class="btn-primario">⬇️ Descargar CSV</button>
       <button type="button" id="btn-hs-borrar" class="btn-secundario">🗑️ Borrar</button>
     </div>
-    <button type="button" id="btn-hs-fin" class="btn-link">← Volver al tamizaje</button>
+    <button type="button" id="btn-hs-fin" class="btn-link">← Volver a la prueba</button>
   </section>
 
   <!-- 2. HEADSENSE: historial -->
@@ -353,7 +354,7 @@
     <div class="card">
       <h1>Resumen de pruebas psicomotrices</h1>
       <div id="pt-resumen-contenido"></div>
-      <p class="texto-ayuda">Estas pruebas son un tamizaje de entrenamiento: no reemplazan el examen de aptitud de un Centro de Reconocimiento de Conductores (CRC).</p>
+      <p class="texto-ayuda">Estas pruebas son de entrenamiento preventivo: no reemplazan el examen de aptitud de un Centro de Reconocimiento de Conductores (CRC).</p>
       <button type="button" id="btn-pt-resumen-volver" class="btn-link">← Volver al menú</button>
     </div>
   </section>
@@ -438,7 +439,7 @@
       <button type="button" id="btn-telb-csv" class="btn-primario">⬇️ Descargar CSV</button>
       <button type="button" id="btn-telb-borrar" class="btn-secundario">🗑️ Borrar</button>
     </div>
-    <button type="button" id="btn-telb-fin" class="btn-link">← Volver al tamizaje</button>
+    <button type="button" id="btn-telb-fin" class="btn-link">← Volver a la prueba</button>
   </section>
 
   <!-- Home -->

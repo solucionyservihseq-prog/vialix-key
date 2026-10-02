@@ -1,7 +1,7 @@
 // Prefijo propio: solo se borran cachés de VIALIX KEY, nunca los de otras
 // apps publicadas en el mismo dominio github.io (p. ej. VIALIX HEADSENSE).
 const CACHE_PREFIJO = "vialix-key-v";
-const CACHE_NAME = CACHE_PREFIJO + "23";
+const CACHE_NAME = CACHE_PREFIJO + "25";
 const ASSETS = [
   "./",
   "./index.html",

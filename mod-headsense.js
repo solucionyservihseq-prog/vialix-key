@@ -141,7 +141,7 @@ const ModHeadsense = (() => {
       fin: null,
       usuario: state.conductor || "",
       identificacion: state.identificacion || "",
-      etiqueta: $("#hs-etiqueta").value.trim() || "Tamizaje preventivo",
+      etiqueta: $("#hs-etiqueta").value.trim() || "Prueba preventiva",
       tipo_vehiculo: hs.vehiculo ? hs.vehiculo.id : "vehiculo",
       perfil: "A",
       placa: $("#hs-placa").value.trim().toUpperCase(),

@@ -210,7 +210,7 @@ const TELEMETRIA_CONFIG = {
    ============================================================ */
 
 const TAMIZAJE_CONFIG = {
-  NOMBRE: "Tamizaje preventivo de seguridad vial",
+  NOMBRE: "Prueba preventiva de seguridad vial",
   VIGENCIA_DIAS: 365,
   // Partes que deben estar presentadas (sin importar el resultado) para que el tamizaje esté al día
   PARTES: ["teorica", "reaccion", "bimanual", "anticipacion", "practica"],

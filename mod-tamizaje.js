@@ -32,7 +32,7 @@ const Tamizaje = (() => {
       const data = await res.json();
       return data && data.status === "ok" ? data.partes : null;
     } catch (err) {
-      console.warn("No se pudo consultar el tamizaje en la hoja:", err);
+      console.warn("No se pudo consultar la prueba en la hoja:", err);
       return null;
     } finally {
       clearTimeout(reloj);
@@ -72,9 +72,9 @@ const Tamizaje = (() => {
       return { clase: "ok", texto: `✓ Tu ${T().NOMBRE.toLowerCase()} está al día. Vigente hasta el ${fecha(e.vence)}.${nota}`, boton: null };
     }
     if (e.ninguna) {
-      return { clase: "alerta", texto: `⚠️ No has presentado tu ${T().NOMBRE.toLowerCase()} de este año. Por favor inícialo.${nota}`, boton: "Iniciar tamizaje" };
+      return { clase: "alerta", texto: `⚠️ No has presentado tu ${T().NOMBRE.toLowerCase()} de este año. Por favor iníciala.${nota}`, boton: "Prueba de Biotelemetría en Conducción" };
     }
-    return { clase: "pendiente", texto: `Tu tamizaje está incompleto. Te falta: ${nombres(e.pendientes)}.${nota}`, boton: "Continuar tamizaje" };
+    return { clase: "pendiente", texto: `Tu prueba está incompleta. Te falta: ${nombres(e.pendientes)}.${nota}`, boton: "Prueba de Biotelemetría en Conducción" };
   }
 
   // Bloque de la pantalla de bienvenida
@@ -85,8 +85,9 @@ const Tamizaje = (() => {
     if (!id) return;
     const n = ++consultaActual;
     caja.className = "tamizaje-estado";
-    caja.textContent = "Verificando tu tamizaje preventivo…";
+    caja.textContent = "Verificando tu prueba preventiva…";
     boton.classList.add("hidden");
+    $("#tamizaje-aviso-guia").classList.add("hidden");
     const e = await estado(id);
     if (n !== consultaActual) return;   // el conductor cambió de datos mientras tanto
     const t = textoEstado(e);
@@ -94,7 +95,8 @@ const Tamizaje = (() => {
     caja.textContent = t.texto;
     const mostrarBoton = !e.vigente || !T().OCULTAR_BOTON_SI_VIGENTE;
     boton.classList.toggle("hidden", !mostrarBoton);
-    $("#tamizaje-boton-texto").textContent = t.boton || "Repetir tamizaje";
+    $("#tamizaje-aviso-guia").classList.toggle("hidden", !mostrarBoton);   // aviso de la guía, siempre bajo el botón
+    $("#tamizaje-boton-texto").textContent = t.boton || "Prueba de Biotelemetría en Conducción";
   }
 
   // Línea de vigencia en la pantalla del tamizaje
