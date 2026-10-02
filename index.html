@@ -110,9 +110,9 @@
       <p>Realiza las tres partes. Todo queda guardado y al final de cada una verás recomendaciones.</p>
       <button type="button" id="btn-ir-teorica" class="btn-gigante btn-gigante-azul">📝 1. Evaluación de conocimiento</button>
       <p id="estado-teorica" class="estado-parte">Pendiente</p>
-      <button type="button" id="btn-ir-headsense" class="btn-gigante btn-gigante-morado">🎯 2. Prueba práctica · VIALIX HEADSENSE</button>
+      <button type="button" id="btn-ir-headsense" class="btn-gigante btn-gigante-morado">🎯 2. Prueba práctica · Telemetría VIALIX</button>
       <p id="estado-headsense" class="estado-parte">Pendiente</p>
-      <p class="texto-ayuda">El celular va sujeto a la cabeza (casco, diadema o gorra) y mide tus movimientos mientras conduces: revisión de espejos, posturas y señales de fatiga.</p>
+      <p class="texto-ayuda">Elige tu vehículo. En carro, camión o maquinaria el celular va en la cabeza y mide fatiga, postura y revisión de espejos; en moto, bicicleta o patineta va en el manubrio y mide frenadas, curvas y maniobras.</p>
       <button type="button" id="btn-ir-psicotest" class="btn-gigante btn-gigante-naranja">🧠 3. Pruebas psicomotrices</button>
       <p id="estado-psicotest" class="estado-parte">Pendiente</p>
       <p class="texto-ayuda">Tiempos de reacción, coordinación de las dos manos y anticipación de la velocidad. Hazlas sentado y sin conducir.</p>
@@ -170,7 +170,8 @@
   <!-- 2. Prueba práctica HEADSENSE: preparar -->
   <section id="view-hs-preparar" class="view">
     <div class="card">
-      <h1>🎯 Prueba práctica · HEADSENSE</h1>
+      <p class="etiqueta">Telemetría de la cabeza · HEADSENSE</p>
+      <h1 id="hs-vehiculo">🚗 Vehículo (liviano)</h1>
       <ol class="pasos">
         <li>Sujeta el celular <strong>en vertical</strong> a la cabeza (diadema, gorra o casco) de modo que no se mueva ni se deslice.</li>
         <li>Deja la pantalla hacia afuera y baja el brillo.</li>
@@ -193,9 +194,8 @@
       </label>
       <p id="hs-error" class="error hidden"></p>
       <button type="button" id="btn-hs-activar" class="btn-primario">Activar sensores y calibrar</button>
-      <button type="button" id="btn-hs-historial" class="btn-secundario">🗂️ Mediciones guardadas</button>
       <p id="hs-pendientes" class="cola-info hidden"></p>
-      <button type="button" id="btn-hs-volver" class="btn-link">← Volver</button>
+      <button type="button" id="btn-hs-volver" class="btn-link">← Cambiar vehículo</button>
     </div>
   </section>
 
@@ -353,6 +353,89 @@
       <p class="texto-ayuda">Estas pruebas son un tamizaje de entrenamiento: no reemplazan el examen de aptitud de un Centro de Reconocimiento de Conductores (CRC).</p>
       <button type="button" id="btn-pt-resumen-volver" class="btn-link">← Volver al menú</button>
     </div>
+  </section>
+
+  <!-- ======================================================
+       v1.8.0 · Prueba práctica híbrida: menú de vehículos y Perfil B
+       ====================================================== -->
+
+  <!-- Menú de tipo de vehículo -->
+  <section id="view-tel-vehiculo" class="view">
+    <div class="card">
+      <h1>🎯 Prueba práctica · Telemetría VIALIX</h1>
+      <p>¿Qué vehículo vas a conducir? Según tu respuesta, la app mide los movimientos de tu cabeza (fatiga y postura) o la dinámica del vehículo (frenadas, curvas y maniobras).</p>
+    </div>
+    <div id="tel-vehiculos" class="tarjetas-vehiculo"></div>
+    <button type="button" id="btn-tel-historial" class="btn-secundario">🗂️ Mediciones guardadas</button>
+    <button type="button" id="btn-tel-volver" class="btn-link">← Volver</button>
+  </section>
+
+  <!-- Perfil B: preparar (moto / no automotor) -->
+  <section id="view-telb-preparar" class="view">
+    <div class="card">
+      <p class="etiqueta">Telemetría del vehículo</p>
+      <h1 id="telb-vehiculo">🏍️ Motocicleta</h1>
+      <div class="alerta-distraccion">
+        <strong>⚠️ No mires el celular mientras conduces.</strong>
+        La app registra todo sola. Mirar la pantalla en marcha es una distracción peligrosa: si necesitas revisarla, detente en un lugar seguro.
+      </div>
+      <ol class="pasos">
+        <li id="telb-instruccion-soporte">Fija el celular VERTICAL en el soporte del manubrio, con la pantalla hacia ti. Asegúrate de que no vibre.</li>
+        <li>La parte de arriba del celular debe quedar hacia arriba. No lo pongas acostado.</li>
+        <li>Al calibrar, deja el vehículo <strong>quieto y derecho</strong> 3 segundos (puedes tenerlo apoyado con los pies o en el gato central).</li>
+        <li>Toca "Detener" solo cuando estés detenido al final del recorrido.</li>
+      </ol>
+      <label class="campo">Recorrido o actividad (opcional)
+        <input type="text" id="telb-etiqueta" placeholder="Ej: Ruta de prueba, circuito de conos">
+      </label>
+      <label class="campo" id="telb-campo-placa">Placa de la motocicleta
+        <input type="text" id="telb-placa" placeholder="Ej: ABC12D" style="text-transform:uppercase">
+      </label>
+      <label class="check">
+        <input type="checkbox" id="telb-demo">
+        Modo demostración (recorrido simulado, para probar sin conducir)
+      </label>
+      <p id="telb-error" class="error hidden"></p>
+      <button type="button" id="btn-telb-activar" class="btn-primario">Activar sensores y calibrar</button>
+      <button type="button" id="btn-telb-volver" class="btn-link">← Cambiar vehículo</button>
+    </div>
+  </section>
+
+  <!-- Perfil B: calibrar -->
+  <section id="view-telb-calibrar" class="view">
+    <div class="card centrado">
+      <div class="resultado-icono azul">🏍️</div>
+      <h1>Calibrando</h1>
+      <p id="telb-calibrar-texto">Deja el vehículo quieto y derecho…</p>
+      <div class="progreso"><span id="telb-calibrar-progreso"></span></div>
+      <button type="button" id="btn-telb-cancelar-calib" class="btn-link">Cancelar</button>
+    </div>
+  </section>
+
+  <!-- Perfil B: medición (pantalla mínima para no distraer) -->
+  <section id="view-telb-medir" class="view">
+    <div class="telb-medir">
+      <p class="telb-rec"><span class="punto-rec"></span> GRABANDO</p>
+      <p id="telb-tiempo" class="telb-tiempo">00:00</p>
+      <p class="telb-no-mires">👀 Mira la vía, no el celular</p>
+      <p id="telb-demo-aviso" class="pildora nivel-medio hidden">Modo demostración</p>
+      <div id="telb-contadores" class="telb-contadores"></div>
+      <button type="button" id="btn-telb-detener" class="btn-accion btn-rojo telb-detener">
+        <span class="btn-accion-icono">⏹️</span>
+        <span>Detener (solo con el vehículo detenido)</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Perfil B: resultado -->
+  <section id="view-telb-resultado" class="view">
+    <p id="telb-resultado-estado" class="estado-sync"></p>
+    <div id="telb-resultado-contenido"></div>
+    <div class="acciones-fila">
+      <button type="button" id="btn-telb-csv" class="btn-primario">⬇️ Descargar CSV</button>
+      <button type="button" id="btn-telb-borrar" class="btn-secundario">🗑️ Borrar</button>
+    </div>
+    <button type="button" id="btn-telb-fin" class="btn-link">← Volver a la prueba teórico-práctica</button>
   </section>
 
   <!-- Home -->
@@ -592,6 +675,19 @@
   </div>
 </div>
 
+<!-- Alerta de posible caída o impacto (Perfil B) -->
+<div id="telb-alerta" class="telb-alerta hidden" role="alertdialog" aria-labelledby="telb-alerta-titulo">
+  <div class="telb-alerta-caja">
+    <p class="telb-alerta-icono">⚠️</p>
+    <h2 id="telb-alerta-titulo">¿Estás bien?</h2>
+    <p id="telb-alerta-texto">Detectamos una posible caída.</p>
+    <button type="button" id="btn-telb-alerta-emergencia" class="btn-accion btn-rojo">
+      <span class="btn-accion-icono">🚨</span><span>Necesito ayuda · EMERGENCIAS VIALES</span>
+    </button>
+    <button type="button" id="btn-telb-alerta-ok" class="btn-secundario">Estoy bien, continuar</button>
+  </div>
+</div>
+
 <!-- Área de las pruebas psicomotrices a pantalla completa -->
 <div id="pt-arena" class="arena hidden">
   <canvas id="pt-lienzo"></canvas>
@@ -606,10 +702,12 @@
 <script src="hs-analisis.js"></script>
 <script src="hs-almacen.js"></script>
 <script src="pt-pruebas.js"></script>
+<script src="tel-chasis.js"></script>
 <script src="app.js"></script>
 <script src="mod-comun.js"></script>
 <script src="mod-teorica.js"></script>
 <script src="mod-psicotest.js"></script>
 <script src="mod-headsense.js"></script>
+<script src="mod-telemetria.js"></script>
 </body>
 </html>

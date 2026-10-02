@@ -7,6 +7,10 @@
    (pestañas Sesiones y Eventos + CSV en Drive).
    Módulos usados: hs-sensor.js (Sensor), hs-analisis.js (Analisis),
    hs-almacen.js (Almacen).
+   v1.8.0: es el PERFIL A de la prueba práctica híbrida (vehículo liviano,
+   pesado y maquinaria amarilla). Se entra desde el menú de vehículos de
+   mod-telemetria.js; el historial muestra también las mediciones del
+   chasis (Perfil B) y se las pasa a ModTelemetria para mostrarlas.
    ============================================================ */
 
 const ModHeadsense = (() => {
@@ -20,7 +24,8 @@ const ModHeadsense = (() => {
     deriva: null,
     ultimaRotCruda: 0,
     calibracion: null,
-    sesionMostrada: null
+    sesionMostrada: null,
+    vehiculo: null       // { id, nombre, icono, perfil } elegido en el menú de vehículos
   };
 
   const lsGet = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
@@ -28,7 +33,10 @@ const ModHeadsense = (() => {
 
   /* ---------- Preparar ---------- */
 
-  function abrir() {
+  function abrir(vehiculo) {
+    if (vehiculo) hs.vehiculo = vehiculo;
+    const v = hs.vehiculo || TELEMETRIA_CONFIG.VEHICULOS.find((x) => x.id === "vehiculo");
+    $("#hs-vehiculo").textContent = `${v.icono} ${v.nombre}`;
     const montaje = lsGet(CLAVE_MONTAJE) || HEADSENSE_CONFIG.MONTAJE;
     const radio = $(`input[name="hs-montaje"][value="${montaje}"]`);
     if (radio) radio.checked = true;
@@ -134,6 +142,8 @@ const ModHeadsense = (() => {
       usuario: state.conductor || "",
       identificacion: state.identificacion || "",
       etiqueta: $("#hs-etiqueta").value.trim() || "Prueba teórico-práctica",
+      tipo_vehiculo: hs.vehiculo ? hs.vehiculo.id : "vehiculo",
+      perfil: "A",
       placa: $("#hs-placa").value.trim().toUpperCase(),
       montaje,
       modo_demo: demo,
@@ -258,6 +268,7 @@ const ModHeadsense = (() => {
   /* ---------- Resultado e historial ---------- */
 
   function mostrarResultado(sesion) {
+    if (sesion.perfil === "B") return ModTelemetria.mostrarResultado(sesion);
     hs.sesionMostrada = sesion;
     Analisis.renderResultado($("#hs-resultado-contenido"), sesion, HEADSENSE_CONFIG);
     const estado = $("#hs-resultado-estado");
@@ -302,16 +313,22 @@ const ModHeadsense = (() => {
       cont.innerHTML = `<div class="card centrado"><p>Todavía no hay mediciones de este conductor en el celular.</p></div>`;
       return;
     }
+    const NIVEL = { bajo: "Bajo", medio: "Medio", alto: "Alto" };
     cont.innerHTML = sesiones.map((s) => {
       const met = s.metricas || {};
+      const veh = TELEMETRIA_CONFIG.VEHICULOS.find((v) => v.id === s.tipo_vehiculo);
+      // Perfil A muestra % en postura de riesgo; Perfil B, el nivel de riesgo de la conducción
+      const indicador = s.perfil === "B"
+        ? NIVEL[met.nivel_riesgo] || "--"
+        : met.pct_riesgo != null ? met.pct_riesgo + "%" : "--";
       return `
         <button type="button" class="historial-item" data-id="${esc(s.id)}">
           <span class="historial-principal">
-            <strong>${esc(s.etiqueta || "Medición")}</strong>
-            <small>${new Date(s.inicio).toLocaleString()} · ${Analisis.fmtDuracion(met.duracion_seg || 0)}${s.modo_demo ? " · demo" : ""}</small>
+            <strong>${veh ? veh.icono + " " : ""}${esc(s.etiqueta || "Medición")}</strong>
+            <small>${new Date(s.inicio).toLocaleString()} · ${Analisis.fmtDuracion(met.duracion_seg || 0)}${s.perfil === "B" ? " · chasis" : " · cabeza"}${s.modo_demo ? " · demo" : ""}</small>
           </span>
           <span class="historial-lado">
-            <span class="pildora nivel-${esc(met.nivel_riesgo || "bajo")}">${met.pct_riesgo != null ? met.pct_riesgo + "%" : "--"}</span>
+            <span class="pildora nivel-${esc(met.nivel_riesgo || "bajo")}">${indicador}</span>
             <small>${s.sincronizada ? "✓ enviada" : "pendiente"}</small>
           </span>
         </button>`;
@@ -331,15 +348,14 @@ const ModHeadsense = (() => {
 
   document.addEventListener("DOMContentLoaded", () => {
     $("#btn-hs-activar").addEventListener("click", activarSensores);
-    $("#btn-hs-historial").addEventListener("click", historial);
-    $("#btn-hs-volver").addEventListener("click", irAPrueba);
+    $("#btn-hs-volver").addEventListener("click", () => ModTelemetria.abrir());
     $("#btn-hs-cancelar-calib").addEventListener("click", cancelarCalibracion);
     $("#btn-hs-recentrar").addEventListener("click", () => { if (hs.deriva) hs.deriva.recentrar(hs.ultimaRotCruda); });
     $("#btn-hs-detener").addEventListener("click", detener);
     $("#btn-hs-csv").addEventListener("click", descargarCSV);
     $("#btn-hs-borrar").addEventListener("click", borrar);
     $("#btn-hs-fin").addEventListener("click", irAPrueba);
-    $("#btn-hs-historial-volver").addEventListener("click", abrir);
+    $("#btn-hs-historial-volver").addEventListener("click", () => ModTelemetria.abrir());
     $("#hs-historial-lista").addEventListener("click", (e) => {
       const item = e.target.closest(".historial-item");
       if (item) abrirDelHistorial(item.dataset.id);
@@ -352,5 +368,5 @@ const ModHeadsense = (() => {
     Almacen.sincronizarPendientes();
   });
 
-  return { abrir, ultimo };
+  return { abrir, ultimo, historial, mostrarResultado };
 })();

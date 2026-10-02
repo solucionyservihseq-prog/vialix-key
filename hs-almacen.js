@@ -91,8 +91,30 @@ const Almacen = (() => {
   }
 
   function armarPayload(s) {
+    // v1.8.0: Perfil B (moto / no automotor) = dinámica del chasis
+    if (s.perfil === "B") {
+      return {
+        tipo: "sesion_chasis",
+        id: s.id,
+        inicio: s.inicio,
+        fin: s.fin,
+        usuario: s.usuario,
+        identificacion: s.identificacion,
+        tipo_vehiculo: s.tipo_vehiculo,
+        etiqueta: s.etiqueta,
+        placa: s.placa,
+        modo_demo: !!s.modo_demo,
+        lat: s.lat,
+        lng: s.lng,
+        metricas: s.metricas,
+        recomendaciones: Chasis.recomendaciones(s.metricas, s.tipo_vehiculo).join(" | "),
+        csv_nombre: Analisis.nombreArchivo(s).replace(/^headsense_/, "chasis_"),
+        csv: Chasis.aCSV(s.muestras, HEADSENSE_CONFIG.CSV_FORMATO)
+      };
+    }
     return {
       tipo: "sesion",
+      tipo_vehiculo: s.tipo_vehiculo || "",
       id: s.id,
       inicio: s.inicio,
       fin: s.fin,

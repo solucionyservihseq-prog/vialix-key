@@ -145,3 +145,58 @@ const HEADSENSE_CONFIG = {
   // pantalla hacia afuera (invierte el signo de flexión y de inclinación).
   MONTAJE: "frente"
 };
+
+/* ============================================================
+   v1.8.0 - Prueba práctica híbrida: telemetría según el vehículo
+   ------------------------------------------------------------
+   Perfil A (cabina): el celular va en la cabeza → HEADSENSE
+     (usa HEADSENSE_CONFIG: posturas, giros de espejos y cabeceos).
+   Perfil B (dos ruedas): el celular va en el manubrio → dinámica
+     del chasis (usa TELEMETRIA_CONFIG.PERFIL_B).
+   Los umbrales del perfil B son ORIENTATIVOS: ajústalos con un grupo
+   piloto. El manubrio vibra y cada soporte transmite distinto.
+   ============================================================ */
+
+const TELEMETRIA_CONFIG = {
+  // Orden y textos de las tarjetas del menú. "perfil": "A" cabeza | "B" chasis
+  VEHICULOS: [
+    { id: "motocicleta", nombre: "Motocicleta", icono: "🏍️", perfil: "B", detalle: "Celular en el soporte del manubrio" },
+    { id: "vehiculo", nombre: "Vehículo (liviano)", icono: "🚗", perfil: "A", detalle: "Celular en la cabeza o la gorra" },
+    { id: "vehiculo_pesado", nombre: "Vehículo pesado", icono: "🚚", perfil: "A", detalle: "Más de 3,8 toneladas · celular en la cabeza" },
+    { id: "maquinaria_amarilla", nombre: "Maquinaria amarilla", icono: "🚜", perfil: "A", detalle: "Operador en cabina · celular en el casco" },
+    { id: "no_automotor", nombre: "No automotor / VELMPU", icono: "🚲", perfil: "B", detalle: "Bicicletas y patinetas · celular en el manubrio" }
+  ],
+
+  PERFIL_B: {
+    FRECUENCIA_MUESTREO_HZ: 25,       // muestras guardadas por segundo (la detección usa todos los datos del sensor, ~60 Hz)
+    DURACION_CALIBRACION_SEG: 3,      // vehículo quieto y derecho
+
+    // Frenadas y aceleraciones bruscas (fuerza G longitudinal)
+    FRENADA_G: 0.40,                  // desaceleración mayor a 0,40 g
+    ACELERACION_G: 0.35,              // aceleración mayor a 0,35 g
+    DURACION_MIN_MS: 300,             // sostenida al menos este tiempo (filtra baches)
+
+    // Inclinación lateral (roll) en curvas
+    INCLINACION_MAX_GRADOS: 35,
+    INCLINACION_MIN_MS: 500,
+
+    // Zigzag / culebreo: giros rápidos alternados con fuerza lateral
+    ZIGZAG_VEL_GIRO_GPS: 30,          // velocidad de giro del manubrio/chasis (°/s)
+    ZIGZAG_ACEL_LATERAL_G: 0.20,
+    ZIGZAG_CAMBIOS: 3,                // cambios de lado dentro de la ventana
+    ZIGZAG_VENTANA_MS: 4000,
+
+    // Impactos y caídas
+    IMPACTO_G: 4.0,                   // pico de fuerza G (los baches fuertes llegan a 2–3 g en el manubrio)
+    CAIDA_INCLINACION_GRADOS: 70,     // el vehículo queda acostado de lado
+    CAIDA_MIN_MS: 1000,
+
+    // Tiempo mínimo entre dos eventos del mismo tipo
+    ANTIRREBOTE_MS: 2000,
+
+    // Nivel de riesgo según eventos por hora (frenadas + aceleraciones +
+    // inclinaciones extremas + 2 × zigzag). Una caída o impacto = alto.
+    NIVEL_MEDIO_EVENTOS_HORA: 4,
+    NIVEL_ALTO_EVENTOS_HORA: 10
+  }
+};

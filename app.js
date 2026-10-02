@@ -319,7 +319,16 @@ async function irAPrueba() {
   estado($("#estado-psicotest"), hechas.length ? `${hechas.length} de 3 realizadas · ${bien} dentro de referencia` : "Pendiente", hechas.length === 3 ? bien === 3 : null);
   try {
     const hs = await ModHeadsense.ultimo();
-    estado($("#estado-headsense"), hs ? `Última medición: ${new Date(hs.inicio).toLocaleDateString()} · ${hs.metricas ? hs.metricas.pct_riesgo + "% en postura de riesgo" : ""}` : "Pendiente", null);
+    if (!hs) {
+      estado($("#estado-headsense"), "Pendiente", null);
+    } else {
+      const veh = TELEMETRIA_CONFIG.VEHICULOS.find((v) => v.id === hs.tipo_vehiculo);
+      const met = hs.metricas || {};
+      const detalle = hs.perfil === "B"
+        ? `riesgo ${{ bajo: "bajo", medio: "medio", alto: "alto" }[met.nivel_riesgo] || "--"} · ${met.eventos_por_hora ?? "--"} eventos/h`
+        : `${met.pct_riesgo ?? "--"}% en postura de riesgo`;
+      estado($("#estado-headsense"), `${veh ? veh.icono + " " : ""}Última medición: ${new Date(hs.inicio).toLocaleDateString()} · ${detalle}`, null);
+    }
   } catch (e) {
     estado($("#estado-headsense"), "Pendiente", null);
   }
@@ -625,7 +634,7 @@ document.addEventListener("DOMContentLoaded", () => {
   $("#btn-volver-tipo").addEventListener("click", renderInicio);
   $("#btn-iniciar-prueba").addEventListener("click", irAPrueba);
   $("#btn-ir-teorica").addEventListener("click", () => ModTeorica.abrir());
-  $("#btn-ir-headsense").addEventListener("click", () => ModHeadsense.abrir());
+  $("#btn-ir-headsense").addEventListener("click", () => ModTelemetria.abrir());
   $("#btn-ir-psicotest").addEventListener("click", () => ModPsicotest.abrir());
   $("#btn-volver-prueba").addEventListener("click", renderInicio);
   $("#btn-formulario-ocasional").href = VIALIX_CONFIG.URL_FORMULARIO_OCASIONAL;
