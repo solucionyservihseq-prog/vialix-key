@@ -663,6 +663,11 @@ async function confirmarFormacion() {
 /* ---------- Inicialización ---------- */
 
 document.addEventListener("DOMContentLoaded", () => {
+  // v1.9.4: el "Modo demostración" (datos simulados) no se muestra a los conductores;
+  // solo aparece si la app se abre con ?demo=1 (para pruebas del administrador).
+  if (new URLSearchParams(location.search).has("demo")) {
+    $all(".solo-demo").forEach((el) => el.classList.remove("hidden"));
+  }
   // Lo primero que se ve al escanear el sticker es la pantalla de EMERGENCIAS.
   state.conductor = localStorage.getItem(STORAGE_KEYS.CONDUCTOR);
   state.identificacion = localStorage.getItem(STORAGE_KEYS.IDENTIFICACION);
