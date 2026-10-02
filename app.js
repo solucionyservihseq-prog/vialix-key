@@ -362,6 +362,7 @@ function elegirTipo(tipo) {
 async function irAPrueba() {
   $("#prueba-nombre").textContent = state.conductor || "--";
   $("#prueba-placa").textContent = state.placa || "--";
+  if (ModTeorica.hayPendiente()) return ModTeorica.abrir();
   showView("view-prueba");
   Tamizaje.pintarPrueba();
 

@@ -134,7 +134,9 @@
       <h1>📝 Evaluación de conocimiento</h1>
       <p><span id="teo-total">20</span> preguntas de selección múltiple sobre normas de tránsito, conducción preventiva y el PESV. Cada pregunta tiene una sola respuesta correcta.</p>
       <ul class="instr-lista">
-        <li>Lee con calma; puedes volver a la pregunta anterior antes de terminar.</li>
+        <li>Tienes <strong><span id="teo-minutos">10</span> minutos</strong>. Si se acaba el tiempo, la evaluación se cierra y se califica con lo que hayas respondido.</li>
+        <li>El tiempo sigue corriendo aunque salgas de la app, y cada salida queda registrada. Respóndela sin consultar otras fuentes.</li>
+        <li>Puedes volver a la pregunta anterior antes de terminar.</li>
         <li>Se aprueba con <strong><span id="teo-aprobacion">80</span>%</strong> o más.</li>
         <li>Al final verás tu calificación, las preguntas a repasar y recomendaciones por tema.</li>
       </ul>
@@ -147,13 +149,17 @@
   <!-- 1. Evaluación teórica: pregunta -->
   <section id="view-teorica-pregunta" class="view">
     <div class="card">
-      <p id="teo-progreso-texto" class="etiqueta">Pregunta 1 de 20</p>
+      <div class="teo-cabecera">
+        <p id="teo-progreso-texto" class="etiqueta">Pregunta 1 de 20</p>
+        <p id="teo-reloj" class="teo-reloj">⏱ 10:00</p>
+      </div>
+      <p id="teo-aviso-reanudar" class="aviso-prueba hidden"></p>
       <div class="teo-progreso"><span id="teo-progreso-barra"></span></div>
       <h2 id="teo-enunciado" class="teo-enunciado">--</h2>
       <div id="teo-opciones" class="teo-opciones"></div>
       <button type="button" id="btn-teo-siguiente" class="btn-primario" disabled>Siguiente →</button>
       <button type="button" id="btn-teo-anterior" class="btn-secundario hidden">← Anterior</button>
-      <button type="button" id="btn-teo-salir" class="btn-link">Salir de la evaluación</button>
+      <button type="button" id="btn-teo-salir" class="btn-link">Entregar ahora</button>
     </div>
   </section>
 
@@ -163,6 +169,7 @@
       <h1>📝 Resultado de la evaluación</h1>
       <div id="teo-nivel" class="nivel">--</div>
       <p id="teo-detalle" class="centrado">--</p>
+      <div id="teo-notas" class="teo-notas hidden"></div>
       <div id="teo-recomendaciones"></div>
       <div id="teo-repaso"></div>
       <p id="teo-envio" class="estado-envio">--</p>

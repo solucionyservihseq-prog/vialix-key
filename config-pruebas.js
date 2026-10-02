@@ -15,7 +15,12 @@ const TEORICA_CONFIG = {
   // Cambiar el orden de las opciones A–D en cada intento (evita copiar el patrón)
   MEZCLAR_OPCIONES: true,
   // Cambiar el orden de las preguntas en cada intento
-  MEZCLAR_PREGUNTAS: false
+  MEZCLAR_PREGUNTAS: false,
+  // v1.9.5: tiempo máximo para toda la evaluación. Al agotarse se cierra y se
+  // califica con lo respondido (lo no respondido cuenta como incorrecto).
+  TIEMPO_MAX_MIN: 10,
+  // El reloj se pone rojo cuando quedan estos minutos
+  AVISO_ULTIMO_MIN: 1
 };
 
 const PSICOTEST_CONFIG = {
