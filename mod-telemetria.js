@@ -158,7 +158,7 @@ const ModTelemetria = (() => {
       fin: null,
       usuario: state.conductor || "",
       identificacion: state.identificacion || "",
-      etiqueta: $("#telb-etiqueta").value.trim() || "Prueba teórico-práctica",
+      etiqueta: $("#telb-etiqueta").value.trim() || "Tamizaje preventivo",
       placa: $("#telb-placa").value.trim().toUpperCase(),
       tipo_vehiculo: b.vehiculo.id,
       perfil: "B",
@@ -246,6 +246,7 @@ const ModTelemetria = (() => {
     showView("view-hs-enviando");
     try { await Almacen.guardarSesion(sesion); } catch (err) { console.warn("No se pudo guardar en el celular:", err); }
     await Almacen.enviarSesion(sesion);
+    ModHeadsense.registrarPractica(sesion);
     mostrarResultado(sesion);
   }
 

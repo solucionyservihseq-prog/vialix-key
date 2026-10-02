@@ -661,3 +661,20 @@ body.en-prueba { overflow: hidden; }
   text-align: center;
   margin-bottom: 14px;
 }
+
+/* ============================================================
+   Parte 4 (v1.9.0): vigencia anual del tamizaje
+   ============================================================ */
+.tamizaje-estado {
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  background: var(--gris-claro);
+  color: #555;
+  text-align: left;
+}
+.tamizaje-estado.ok { background: #DDF3E8; color: var(--verde-oscuro); font-weight: 700; }
+.tamizaje-estado.alerta { background: #FCE4E4; color: #9B2C2C; font-weight: 700; border-left: 5px solid var(--rojo); }
+.tamizaje-estado.pendiente { background: #FFF7DA; color: #6B5310; font-weight: 700; border-left: 5px solid var(--dorado); }
+.aviso-legal { font-size: 0.75rem; line-height: 1.4; color: #7A8580; text-align: left; margin-top: 14px; }

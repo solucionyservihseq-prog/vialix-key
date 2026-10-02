@@ -247,6 +247,8 @@ function mostrarTipoConductor() {
   $("#inicio-nombre").textContent = state.conductor;
   $("#inicio-placa").textContent = state.placa;
   mostrarBloqueInicio("tipo");
+  // v1.9.0: ¿esta identificación ya presentó el tamizaje de este año?
+  Tamizaje.pintarInicio();
 }
 
 function renderInicio() {
@@ -299,13 +301,14 @@ function elegirTipo(tipo) {
   else irAHome();
 }
 
-// Prueba teórico-práctica (v1.7.0): las tres partes están dentro de la app
+// Tamizaje preventivo (v1.7.0+): las tres partes están dentro de la app
 // (mod-teorica.js, mod-headsense.js, mod-psicotest.js). Aquí se muestra el
 // estado de cada una para el conductor actual.
 async function irAPrueba() {
   $("#prueba-nombre").textContent = state.conductor || "--";
   $("#prueba-placa").textContent = state.placa || "--";
   showView("view-prueba");
+  Tamizaje.pintarPrueba();
 
   const ultimos = PruebasComun.ultimos();
   const estado = (el, texto, ok) => {

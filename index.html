@@ -76,12 +76,12 @@
           <span>Conductor ocasional</span>
         </button>
 
-        <!-- Prueba teórico-práctica de conducción (v1.5.0) -->
+        <!-- Tamizaje preventivo de seguridad vial (v1.9.0: vigencia anual por identificación) -->
         <div class="bloque-prueba">
-          <p>¿Deseas iniciar la prueba teórico-práctica de conducción?</p>
-          <button type="button" id="btn-iniciar-prueba" class="btn-accion btn-morado">
+          <p id="tamizaje-estado" class="tamizaje-estado">Verificando tu tamizaje preventivo…</p>
+          <button type="button" id="btn-iniciar-prueba" class="btn-accion btn-morado hidden">
             <span class="btn-accion-icono">🎓</span>
-            <span>Iniciar prueba teórico-práctica</span>
+            <span id="tamizaje-boton-texto">Iniciar tamizaje</span>
           </button>
         </div>
 
@@ -102,12 +102,13 @@
     </div>
   </section>
 
-  <!-- Prueba teórico-práctica: evaluación de conocimiento + VIALIX HEADSENSE -->
+  <!-- Tamizaje preventivo de seguridad vial: conocimiento, práctica y psicomotrices -->
   <section id="view-prueba" class="view">
     <div class="card centrado">
-      <h1>Prueba teórico-práctica de conducción</h1>
+      <h1>Tamizaje preventivo de seguridad vial</h1>
       <p class="resumen-conductor">Conductor: <strong id="prueba-nombre">--</strong> · Placa: <strong id="prueba-placa">--</strong></p>
-      <p>Realiza las tres partes. Todo queda guardado y al final de cada una verás recomendaciones.</p>
+      <p id="prueba-vigencia" class="tamizaje-estado">Verificando vigencia…</p>
+      <p>Realiza las tres partes una vez al año. Todo queda guardado y al final de cada una verás recomendaciones.</p>
       <button type="button" id="btn-ir-teorica" class="btn-gigante btn-gigante-azul">📝 1. Evaluación de conocimiento</button>
       <p id="estado-teorica" class="estado-parte">Pendiente</p>
       <button type="button" id="btn-ir-headsense" class="btn-gigante btn-gigante-morado">🎯 2. Prueba práctica · Telemetría VIALIX</button>
@@ -116,12 +117,13 @@
       <button type="button" id="btn-ir-psicotest" class="btn-gigante btn-gigante-naranja">🧠 3. Pruebas psicomotrices</button>
       <p id="estado-psicotest" class="estado-parte">Pendiente</p>
       <p class="texto-ayuda">Tiempos de reacción, coordinación de las dos manos y anticipación de la velocidad. Hazlas sentado y sin conducir.</p>
+      <p class="aviso-legal">Herramienta de promoción y prevención de la seguridad vial. No es un examen de aptitud psicofísica, no reemplaza la evaluación médica ocupacional ni el examen de un Centro de Reconocimiento de Conductores, y no certifica la idoneidad para conducir.</p>
       <button type="button" id="btn-volver-prueba" class="btn-link">← Volver</button>
     </div>
   </section>
 
   <!-- ======================================================
-       Prueba teórico-práctica (v1.7.0): todo dentro de VIALIX KEY
+       Tamizaje preventivo (v1.7.0+): todo dentro de VIALIX KEY
        ====================================================== -->
 
   <!-- 1. Evaluación teórica: inicio -->
@@ -162,7 +164,7 @@
       <div id="teo-recomendaciones"></div>
       <div id="teo-repaso"></div>
       <p id="teo-envio" class="estado-envio">--</p>
-      <button type="button" id="btn-teo-fin" class="btn-primario">Continuar con la prueba</button>
+      <button type="button" id="btn-teo-fin" class="btn-primario">Continuar con el tamizaje</button>
       <button type="button" id="btn-teo-repetir" class="btn-secundario">↻ Repetir evaluación</button>
     </div>
   </section>
@@ -295,7 +297,7 @@
       <button type="button" id="btn-hs-csv" class="btn-primario">⬇️ Descargar CSV</button>
       <button type="button" id="btn-hs-borrar" class="btn-secundario">🗑️ Borrar</button>
     </div>
-    <button type="button" id="btn-hs-fin" class="btn-link">← Volver a la prueba teórico-práctica</button>
+    <button type="button" id="btn-hs-fin" class="btn-link">← Volver al tamizaje</button>
   </section>
 
   <!-- 2. HEADSENSE: historial -->
@@ -435,7 +437,7 @@
       <button type="button" id="btn-telb-csv" class="btn-primario">⬇️ Descargar CSV</button>
       <button type="button" id="btn-telb-borrar" class="btn-secundario">🗑️ Borrar</button>
     </div>
-    <button type="button" id="btn-telb-fin" class="btn-link">← Volver a la prueba teórico-práctica</button>
+    <button type="button" id="btn-telb-fin" class="btn-link">← Volver al tamizaje</button>
   </section>
 
   <!-- Home -->
@@ -709,5 +711,6 @@
 <script src="mod-psicotest.js"></script>
 <script src="mod-headsense.js"></script>
 <script src="mod-telemetria.js"></script>
+<script src="mod-tamizaje.js"></script>
 </body>
 </html>

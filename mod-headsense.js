@@ -141,7 +141,7 @@ const ModHeadsense = (() => {
       fin: null,
       usuario: state.conductor || "",
       identificacion: state.identificacion || "",
-      etiqueta: $("#hs-etiqueta").value.trim() || "Prueba teórico-práctica",
+      etiqueta: $("#hs-etiqueta").value.trim() || "Tamizaje preventivo",
       tipo_vehiculo: hs.vehiculo ? hs.vehiculo.id : "vehiculo",
       perfil: "A",
       placa: $("#hs-placa").value.trim().toUpperCase(),
@@ -262,7 +262,26 @@ const ModHeadsense = (() => {
       console.warn("No se pudo guardar la sesión en el celular:", err);
     }
     await Almacen.enviarSesion(sesion);
+    registrarPractica(sesion);
     mostrarResultado(sesion);
+  }
+
+  // v1.9.0: registrar la parte práctica del tamizaje (resumen) en la hoja de PSICOTEST.
+  // Las mediciones en modo demostración no cuentan.
+  function registrarPractica(sesion) {
+    if (sesion.modo_demo) return;
+    const m = sesion.metricas || {};
+    const perfilB = sesion.perfil === "B";
+    const resumen = {
+      perfil: sesion.perfil || "A",
+      tipo_vehiculo: sesion.tipo_vehiculo || "",
+      duracion_seg: m.duracion_seg,
+      nivel_riesgo: m.nivel_riesgo,
+      indicador: perfilB ? `${m.eventos_por_hora} eventos/h` : `${m.pct_riesgo}% en postura de riesgo`,
+      sesion_telemetria_id: sesion.id,
+      dentro_referencia: m.nivel_riesgo !== "alto"
+    };
+    PruebasComun.registrar(PruebasComun.crearResultado("practica", new Date(sesion.inicio), resumen, []));
   }
 
   /* ---------- Resultado e historial ---------- */
@@ -368,5 +387,5 @@ const ModHeadsense = (() => {
     Almacen.sincronizarPendientes();
   });
 
-  return { abrir, ultimo, historial, mostrarResultado };
+  return { abrir, ultimo, historial, mostrarResultado, registrarPractica };
 })();

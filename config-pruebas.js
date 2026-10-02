@@ -200,3 +200,30 @@ const TELEMETRIA_CONFIG = {
     NIVEL_ALTO_EVENTOS_HORA: 10
   }
 };
+
+/* ============================================================
+   v1.9.0 - Tamizaje preventivo de seguridad vial (vigencia anual)
+   ------------------------------------------------------------
+   Al ingresar (o cambiar) los datos del conductor, la app consulta
+   en la hoja de PSICOTEST qué partes presentó esa identificación y
+   cuándo. Si todas están dentro de la vigencia, el botón se oculta.
+   ============================================================ */
+
+const TAMIZAJE_CONFIG = {
+  NOMBRE: "Tamizaje preventivo de seguridad vial",
+  VIGENCIA_DIAS: 365,
+  // Partes que deben estar presentadas (sin importar el resultado) para que el tamizaje esté al día
+  PARTES: ["teorica", "reaccion", "bimanual", "anticipacion", "practica"],
+  NOMBRES_PARTES: {
+    teorica: "Evaluación de conocimiento",
+    reaccion: "Reacción múltiple",
+    bimanual: "Coordinación bimanual",
+    anticipacion: "Anticipación de la velocidad",
+    practica: "Prueba práctica (telemetría)"
+  },
+  // true: si el tamizaje está vigente, el botón de inicio desaparece.
+  // false: se muestra igual (útil si el SST quiere repetirlo antes del año).
+  OCULTAR_BOTON_SI_VIGENTE: true,
+  // Si la consulta a la hoja tarda más, se decide solo con lo guardado en el celular
+  TIEMPO_MAX_CONSULTA_MS: 6000
+};

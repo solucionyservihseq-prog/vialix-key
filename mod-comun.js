@@ -63,9 +63,8 @@ const PruebasComun = (() => {
     escribir(CLAVES.HISTORIAL, h.slice(-MAX_HISTORIAL));
   }
 
-  // Último resultado de cada prueba para el conductor actual
-  function ultimos() {
-    const id = state.identificacion;
+  // Último resultado de cada prueba para una identificación (por defecto, el conductor actual)
+  function ultimos(id = state.identificacion) {
     const res = {};
     leer(CLAVES.HISTORIAL)
       .filter((r) => r.identificacion === id)
