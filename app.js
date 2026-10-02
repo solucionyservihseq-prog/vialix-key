@@ -13,7 +13,7 @@ const state = {
   conductor: null,
   identificacion: null,
   placa: null,
-  ubicacion: "pendiente", // pendiente | ok | denegada | error
+  ubicacion: "pendiente", // pendiente | ok | sin_senal | denegada | apagada | no_soportada
   ultimaGeo: null // ubicación más reciente, para registrar la alerta sin demorar la llamada
 };
 
@@ -196,31 +196,64 @@ function mostrarGuiaEmergencia(hayHeridos) {
 
 // Pide el permiso de ubicación (el navegador muestra su propio aviso) y
 // espera con calma a que la persona responda, a diferencia de getGeo().
+// v1.9.1: la ubicación es obligatoria para continuar.
+//   denegada  → la persona no dio el permiso (bloquea)
+//   apagada   → el GPS / la ubicación del celular está apagada (bloquea)
+//   sin_senal → hay permiso pero el GPS no respondió a tiempo (deja continuar:
+//               no es culpa del conductor y la ubicación se reintenta después)
 function solicitarUbicacion() {
-  return new Promise((resolve) => {
-    if (!navigator.geolocation) return resolve("error");
+  const intento = (opciones) => new Promise((resolve) => {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         state.ultimaGeo = { lat: pos.coords.latitude, lng: pos.coords.longitude };
         resolve("ok");
       },
-      (err) => resolve(err && err.code === 1 ? "denegada" : "error"),
-      { timeout: 20000, enableHighAccuracy: true }
+      (err) => resolve(!err ? "sin_senal" : err.code === 1 ? "denegada" : err.code === 2 ? "apagada" : "sin_senal"),
+      opciones
     );
   });
+  if (!navigator.geolocation) return Promise.resolve("no_soportada");
+  return intento({ timeout: 20000, enableHighAccuracy: true }).then((r) =>
+    // Bajo techo el GPS de alta precisión puede tardar: segundo intento con la red
+    r === "sin_senal" ? intento({ timeout: 15000, enableHighAccuracy: false, maximumAge: 600000 }) : r
+  );
+}
+
+function ubicacionPermitida() {
+  return state.ubicacion === "ok" || state.ubicacion === "sin_senal";
+}
+
+// Estado del permiso sin mostrar el aviso del navegador (si el navegador lo soporta)
+async function permisoUbicacion() {
+  try {
+    if (navigator.permissions && navigator.permissions.query) {
+      return (await navigator.permissions.query({ name: "geolocation" })).state; // granted | denied | prompt
+    }
+  } catch (e) { /* navegador sin Permissions API */ }
+  return "desconocido";
+}
+
+function pasosActivarUbicacion() {
+  const iphone = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  return iphone
+    ? "En el iPhone: Ajustes → Privacidad y seguridad → Localización (activada) → Safari → \"Al usar la app\". Luego vuelve aquí y toca \"Reintentar\"."
+    : "En Android: toca el candado 🔒 junto a la dirección (o en Chrome: ⋮ → Configuración → Configuración de sitios → Ubicación) y elige \"Permitir\". Revisa también que la Ubicación del celular esté encendida. Luego toca \"Reintentar\".";
 }
 
 function mostrarEstadoUbicacion() {
   const el = $("#estado-ubicacion");
   const mensajes = {
     ok: "✅ Ubicación activada. ¡Gracias!",
-    denegada: "⚠️ No diste permiso de ubicación. Sin ella no podremos registrar dónde ocurre una emergencia. Para activarla: Ajustes del celular → Privacidad → Localización → tu navegador → \"Al usar\". Luego toca el botón de nuevo.",
-    error: "⚠️ No pudimos obtener tu ubicación (revisa que el GPS esté encendido). Puedes continuar e intentarlo más tarde."
+    sin_senal: "✅ Permiso de ubicación activado. La señal del GPS está débil en este momento; se volverá a intentar automáticamente.",
+    denegada: "⛔ Para usar VIALIX KEY debes permitir la ubicación. " + pasosActivarUbicacion(),
+    apagada: "⛔ La ubicación de tu celular está apagada. Enciéndela (desliza desde arriba y activa \"Ubicación\") y toca \"Reintentar\".",
+    no_soportada: "⛔ Este navegador no permite obtener la ubicación. Abre VIALIX KEY en Chrome (Android) o Safari (iPhone)."
   };
   el.textContent = mensajes[state.ubicacion] || "";
-  el.className = "estado-ubicacion " + (state.ubicacion === "ok" ? "estado-ok" : "estado-alerta");
+  el.className = "estado-ubicacion " + (ubicacionPermitida() ? "estado-ok" : "estado-alerta estado-bloqueo");
   el.classList.toggle("hidden", !mensajes[state.ubicacion]);
-  $("#btn-activar-ubicacion").classList.toggle("hidden", state.ubicacion === "ok");
+  $("#btn-activar-ubicacion").classList.toggle("hidden", ubicacionPermitida());
+  $("#btn-activar-ubicacion").textContent = state.ubicacion === "pendiente" ? "📍 Activar ubicación ahora" : "🔄 Ya la activé, reintentar";
 }
 
 async function activarUbicacion() {
@@ -229,7 +262,6 @@ async function activarUbicacion() {
   btn.textContent = "Esperando tu respuesta…";
   state.ubicacion = await solicitarUbicacion();
   btn.disabled = false;
-  btn.textContent = "📍 Activar ubicación ahora";
   mostrarEstadoUbicacion();
 }
 
@@ -251,16 +283,39 @@ function mostrarTipoConductor() {
   Tamizaje.pintarInicio();
 }
 
-function renderInicio() {
-  // Quien ya se registró ve directamente las dos opciones (permanente / ocasional);
-  // quien es nuevo (o tiene datos incompletos) completa primero sus datos.
-  if (state.conductor && state.identificacion && state.placa) {
-    mostrarTipoConductor();
-  } else {
-    precargarDatos();
-    mostrarBloqueInicio("datos");
-  }
+async function renderInicio() {
+  // Quien ya se registró ve directamente las dos opciones (permanente / ocasional),
+  // siempre que mantenga el permiso de ubicación (v1.9.1); quien es nuevo, tiene
+  // datos incompletos o quitó el permiso completa primero sus datos.
+  const completo = state.conductor && state.identificacion && state.placa;
+  // La pantalla (con el botón de EMERGENCIAS VIALES) se muestra de inmediato,
+  // sin esperar al GPS: mientras se revisa el permiso se ven los datos.
+  precargarDatos();
+  mostrarBloqueInicio("datos");
   showView("view-inicio");
+  if (completo && await ubicacionAutorizada()) {
+    mostrarTipoConductor();
+  } else if (completo) {
+    mostrarEstadoUbicacion();   // explica por qué no pasa directo
+  }
+}
+
+// ¿Se puede dejar pasar a quien ya tiene sus datos guardados?
+async function ubicacionAutorizada() {
+  if (ubicacionPermitida()) return true;
+  const permiso = await permisoUbicacion();
+  if (permiso === "granted") {
+    state.ubicacion = "ok";
+    refrescarUbicacion();               // en segundo plano
+    return true;
+  }
+  if (permiso === "denied") {
+    state.ubicacion = "denegada";
+    return false;
+  }
+  // "prompt" (aún no decide) o navegador sin Permissions API: pedirla ahora
+  state.ubicacion = await solicitarUbicacion();
+  return ubicacionPermitida();
 }
 
 async function guardarDatos() {
@@ -278,21 +333,21 @@ async function guardarDatos() {
   localStorage.setItem(STORAGE_KEYS.IDENTIFICACION, identificacion);
   localStorage.setItem(STORAGE_KEYS.PLACA, placa);
 
-  // Si todavía no se pidió el permiso, se pide ahora; si lo negó, se le
-  // avisa una vez y en el siguiente toque puede continuar sin ubicación.
-  if (state.ubicacion === "pendiente") {
+  // v1.9.1: la ubicación es obligatoria. Se pide (o se vuelve a intentar) y,
+  // si no hay permiso o el GPS está apagado, NO se deja continuar.
+  if (!ubicacionPermitida()) {
     const btn = $("#btn-guardar-datos");
     btn.disabled = true;
     btn.textContent = "Solicitando ubicación…";
     state.ubicacion = await solicitarUbicacion();
     btn.disabled = false;
+    btn.textContent = "Continuar";
     mostrarEstadoUbicacion();
-    if (state.ubicacion !== "ok") {
-      btn.textContent = "Continuar sin ubicación";
+    if (!ubicacionPermitida()) {
+      $("#estado-ubicacion").scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
   }
-  $("#btn-guardar-datos").textContent = "Continuar";
   mostrarTipoConductor();
 }
 
