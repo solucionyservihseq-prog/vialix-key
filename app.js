@@ -6,6 +6,8 @@ const STORAGE_KEYS = {
   CONDUCTOR: "vialix_conductor",
   IDENTIFICACION: "vialix_identificacion",
   PLACA: "vialix_placa",
+  CORREO: "vialix_correo",
+  CELULAR: "vialix_celular",
   QUEUE: "vialix_queue_pendiente"
 };
 
@@ -13,6 +15,8 @@ const state = {
   conductor: null,
   identificacion: null,
   placa: null,
+  correo: null,
+  celular: null,
   ubicacion: "pendiente", // pendiente | ok | sin_senal | denegada | apagada | no_soportada
   ultimaGeo: null // ubicación más reciente, para registrar la alerta sin demorar la llamada
 };
@@ -273,27 +277,29 @@ function precargarDatos() {
   if (state.conductor) $("#input-conductor").value = state.conductor;
   if (state.identificacion) $("#input-identificacion").value = state.identificacion;
   if (state.placa) $("#input-placa").value = state.placa;
+  if (state.correo) $("#input-correo").value = state.correo;
+  if (state.celular) $("#input-celular").value = state.celular;
+  ModLegal.precargarCasillas();   // v1.10.0: casillas según lo que autorizó esta identificación
 }
 
 function mostrarTipoConductor() {
   $("#inicio-nombre").textContent = state.conductor;
   $("#inicio-placa").textContent = state.placa;
   mostrarBloqueInicio("tipo");
-  // v1.9.0: ¿esta identificación ya presentó el tamizaje de este año?
-  Tamizaje.pintarInicio();
 }
 
 async function renderInicio() {
   // Quien ya se registró ve directamente las dos opciones (permanente / ocasional),
   // siempre que mantenga el permiso de ubicación (v1.9.1); quien es nuevo, tiene
   // datos incompletos o quitó el permiso completa primero sus datos.
-  const completo = state.conductor && state.identificacion && state.placa;
+  const completo = state.conductor && state.identificacion && state.placa && state.correo && state.celular;
   // La pantalla (con el botón de EMERGENCIAS VIALES) se muestra de inmediato,
   // sin esperar al GPS: mientras se revisa el permiso se ven los datos.
   precargarDatos();
   mostrarBloqueInicio("datos");
   showView("view-inicio");
-  if (completo && await ubicacionAutorizada()) {
+  // v1.10.0: también debe haber aceptado la versión vigente de los Términos
+  if (completo && ModLegal.vigente() && await ubicacionAutorizada()) {
     mostrarTipoConductor();
   } else if (completo) {
     mostrarEstadoUbicacion();   // explica por qué no pasa directo
@@ -322,13 +328,33 @@ async function guardarDatos() {
   const nombre = $("#input-conductor").value.trim();
   const identificacion = $("#input-identificacion").value.trim();
   const placa = $("#input-placa").value.trim().toUpperCase();
-  if (!nombre || !identificacion || !placa) {
-    alert("Por favor escribe tu nombre, tu número de identificación y la placa del vehículo para continuar.");
+  const correo = $("#input-correo").value.trim().toLowerCase();
+  const celular = $("#input-celular").value.replace(/\D/g, "");
+  if (!nombre || !identificacion || !placa || !correo || !celular) {
+    alert("Por favor escribe tu nombre, identificación, placa, correo y celular para continuar.");
     return;
   }
+  // v1.10.1: correo válido y celular colombiano (10 dígitos, empieza por 3)
+  const errorDatos = !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(correo)
+    ? "Revisa tu correo electrónico: debe tener la forma nombre@dominio.com."
+    : !/^3\d{9}$/.test(celular)
+      ? "Revisa tu celular: debe tener 10 dígitos y empezar por 3 (ej: 3001234567)."
+      : "";
+  $("#datos-error").textContent = errorDatos;
+  $("#datos-error").classList.toggle("hidden", !errorDatos);
+  if (errorDatos) {
+    $("#datos-error").scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+  // v1.10.0: aceptar los Términos y la Política de datos es obligatorio
+  if (!ModLegal.validarBienvenida()) return;
   state.conductor = nombre;
   state.identificacion = identificacion;
   state.placa = placa;
+  state.correo = correo;
+  state.celular = celular;
+  localStorage.setItem(STORAGE_KEYS.CORREO, correo);
+  localStorage.setItem(STORAGE_KEYS.CELULAR, celular);
   localStorage.setItem(STORAGE_KEYS.CONDUCTOR, nombre);
   localStorage.setItem(STORAGE_KEYS.IDENTIFICACION, identificacion);
   localStorage.setItem(STORAGE_KEYS.PLACA, placa);
@@ -348,6 +374,7 @@ async function guardarDatos() {
       return;
     }
   }
+  ModLegal.guardarBienvenida();   // deja evidencia de la autorización (o de su cambio)
   mostrarTipoConductor();
 }
 
@@ -364,6 +391,7 @@ async function irAPrueba() {
   $("#prueba-placa").textContent = state.placa || "--";
   if (ModTeorica.hayPendiente()) return ModTeorica.abrir();
   showView("view-prueba");
+  ModLegal.pintarPrueba();   // v1.10.0: autorización de datos sensibles antes de la prueba
   Tamizaje.pintarPrueba();
 
   const ultimos = PruebasComun.ultimos();
@@ -395,7 +423,7 @@ async function irAPrueba() {
 
 function cambiarConductor() {
   Object.values(STORAGE_KEYS).forEach((k) => { if (k !== STORAGE_KEYS.QUEUE) localStorage.removeItem(k); });
-  state.conductor = state.identificacion = state.placa = null;
+  state.conductor = state.identificacion = state.placa = state.correo = state.celular = null;
   renderInicio();
 }
 
@@ -408,6 +436,8 @@ function irAHome() {
   $("#home-cliente").textContent = VIALIX_CONFIG.NOMBRE_CLIENTE;
   actualizarBadgeCola();
   showView("view-home");
+  // v1.10.2: ¿esta identificación ya presentó la prueba preventiva de este año?
+  Tamizaje.pintarInicio();
 }
 
 /* ---------- Enfoque mental ---------- */
@@ -673,6 +703,8 @@ document.addEventListener("DOMContentLoaded", () => {
   state.conductor = localStorage.getItem(STORAGE_KEYS.CONDUCTOR);
   state.identificacion = localStorage.getItem(STORAGE_KEYS.IDENTIFICACION);
   state.placa = localStorage.getItem(STORAGE_KEYS.PLACA);
+  state.correo = localStorage.getItem(STORAGE_KEYS.CORREO);
+  state.celular = localStorage.getItem(STORAGE_KEYS.CELULAR);
   // Quien ya se registró vio antes la explicación: se actualiza la ubicación en silencio.
   // A quien es nuevo no se le pide nada hasta explicarle por qué.
   if (state.conductor) refrescarUbicacion();
@@ -700,7 +732,7 @@ document.addEventListener("DOMContentLoaded", () => {
   $("#btn-ir-teorica").addEventListener("click", () => ModTeorica.abrir());
   $("#btn-ir-headsense").addEventListener("click", () => ModTelemetria.abrir());
   $("#btn-ir-psicotest").addEventListener("click", () => ModPsicotest.abrir());
-  $("#btn-volver-prueba").addEventListener("click", renderInicio);
+  $("#btn-volver-prueba").addEventListener("click", irAHome);
   $("#btn-formulario-ocasional").href = VIALIX_CONFIG.URL_FORMULARIO_OCASIONAL;
   $("#btn-actualizar-datos").href = VIALIX_CONFIG.URL_ACTUALIZACION_DATOS;
 

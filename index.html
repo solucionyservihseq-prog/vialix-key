@@ -48,17 +48,38 @@
           <input type="text" id="input-identificacion" placeholder="Ej: 1234567890" inputmode="numeric">
         </label>
         <label class="campo">
+          Celular
+          <input type="tel" id="input-celular" placeholder="Ej: 3001234567" autocomplete="tel" inputmode="numeric" maxlength="10">
+        </label>
+        <label class="campo">
           Placa del vehículo
           <input type="text" id="input-placa" placeholder="Ej: ABC123" maxlength="10" style="text-transform:uppercase" autocapitalize="characters">
         </label>
+        <!-- v1.10.1: datos de contacto -->
+        <label class="campo">
+          Correo electrónico
+          <input type="email" id="input-correo" placeholder="Ej: nombre@correo.com" autocomplete="email" inputmode="email" autocapitalize="off">
+        </label>
+        <p id="datos-error" class="legal-error hidden"></p>
 
         <div class="aviso-ubicacion">
-          <strong>📍 ¿Por qué necesitamos tu ubicación?</strong>
-          <p>Para registrar <em>dónde</em> ocurre un accidente o una emergencia y dónde inicias y terminas tus recorridos, y así tu empresa y la ARL puedan ayudarte más rápido. Solo se guarda cuando tú usas los botones de emergencia o de recorrido.</p>
-          <p><strong>Es obligatorio permitir la ubicación para usar VIALIX KEY.</strong> Al continuar, tu celular te pedirá permiso: elige <strong>"Permitir"</strong>.</p>
-          <p class="nota-emergencia">El botón rojo de EMERGENCIAS VIALES funciona siempre, aunque no hayas dado el permiso.</p>
+          <strong>📍 Ubicación obligatoria</strong>
+          <p class="texto-corto">Solo se registra al usar emergencias, recorridos o reporte de novedades, para ayudarte más rápido. Al continuar, elige <strong>"Permitir"</strong>. El botón de EMERGENCIAS VIALES funciona siempre.</p>
           <p id="estado-ubicacion" class="estado-ubicacion hidden"></p>
           <button type="button" id="btn-activar-ubicacion" class="btn-secundario">📍 Activar ubicación ahora</button>
+        </div>
+
+        <!-- v1.10.0: Términos y autorizaciones (Ley 1581 de 2012) -->
+        <div class="legal-casillas">
+          <label class="legal-casilla">
+            <input type="checkbox" id="chk-terminos">
+            <span>Acepto los <a href="#" data-legal="terminos">Términos y condiciones</a> y la <a href="#" data-legal="politica">Política de datos</a>, incluido el uso de mi ubicación. <em>(Obligatorio)</em></span>
+          </label>
+          <label class="legal-casilla">
+            <input type="checkbox" id="chk-contacto">
+            <span>Acepto recibir campañas de seguridad vial y seguimiento por correo, SMS, WhatsApp o llamada. <em>(Opcional)</em></span>
+          </label>
+          <p id="legal-error" class="legal-error hidden">Debes aceptar los Términos y la Política de datos para continuar.</p>
         </div>
 
         <button type="button" id="btn-guardar-datos" class="btn-primario">Continuar</button>
@@ -76,16 +97,6 @@
           <span class="btn-accion-icono">🕐</span>
           <span>Conductor ocasional</span>
         </button>
-
-        <!-- Tamizaje preventivo de seguridad vial (v1.9.0: vigencia anual por identificación) -->
-        <div class="bloque-prueba">
-          <p id="tamizaje-estado" class="tamizaje-estado">Verificando tu prueba preventiva…</p>
-          <button type="button" id="btn-iniciar-prueba" class="btn-accion btn-morado hidden">
-            <span class="btn-accion-icono">🎓</span>
-            <span id="tamizaje-boton-texto">Prueba de Biotelemetría en Conducción</span>
-          </button>
-          <p id="tamizaje-aviso-guia" class="aviso-guia hidden">Esta herramienta genera indicadores orientativos para gestión en seguridad vial. No reemplaza la valoración de un profesional de la salud, ni prueba de conducción.</p>
-        </div>
 
         <button type="button" id="btn-editar-datos" class="btn-link">← Editar mis datos</button>
       </div>
@@ -111,6 +122,12 @@
       <p class="resumen-conductor">Conductor: <strong id="prueba-nombre">--</strong> · Placa: <strong id="prueba-placa">--</strong></p>
       <p id="prueba-vigencia" class="tamizaje-estado">Verificando vigencia…</p>
       <p>Realiza las tres partes una vez al año. Todo queda guardado y al final de cada una verás recomendaciones.</p>
+      <!-- v1.10.0: autorización expresa y voluntaria de datos sensibles (art. 6, Ley 1581 de 2012) -->
+      <label class="legal-casilla legal-sensibles">
+        <input type="checkbox" id="chk-sensibles">
+        <span>Autorizo el uso de los resultados de mi prueba, que pueden ser <strong>datos sensibles</strong> (salud), según la <a href="#" data-legal="politica">Política de datos</a>. Es voluntario: sin esto puedo seguir usando la app.</span>
+      </label>
+      <p id="prueba-bloqueada" class="legal-error hidden">Marca la autorización para presentar la prueba.</p>
       <button type="button" id="btn-ir-teorica" class="btn-gigante btn-gigante-azul">📝 1. Evaluación de conocimiento</button>
       <p id="estado-teorica" class="estado-parte">Pendiente</p>
       <button type="button" id="btn-ir-headsense" class="btn-gigante btn-gigante-morado">🎯 2. Prueba práctica · Telemetría VIALIX</button>
@@ -120,6 +137,7 @@
       <p id="estado-psicotest" class="estado-parte">Pendiente</p>
       <p class="texto-ayuda">Tiempos de reacción, coordinación de las dos manos y anticipación de la velocidad. Hazlas sentado y sin conducir.</p>
       <p class="aviso-legal">Herramienta de promoción y prevención de la seguridad vial. No es un examen de aptitud psicofísica, no reemplaza la evaluación médica ocupacional ni el examen de un Centro de Reconocimiento de Conductores, y no certifica la idoneidad para conducir.</p>
+      <p class="legal-enlaces"><a href="#" data-legal="terminos">Términos y condiciones</a> · <a href="#" data-legal="politica">Política de datos personales</a></p>
       <button type="button" id="btn-volver-prueba" class="btn-link">← Volver</button>
     </div>
   </section>
@@ -451,6 +469,16 @@
     <button type="button" id="btn-telb-fin" class="btn-link">← Volver a la prueba</button>
   </section>
 
+  <!-- v1.10.0: lectura de Términos y Política de datos -->
+  <section id="view-legal" class="view">
+    <div class="legal-pestanas">
+      <button type="button" class="legal-pestana" data-doc="terminos">Términos y condiciones</button>
+      <button type="button" class="legal-pestana" data-doc="politica">Política de datos</button>
+    </div>
+    <div class="card legal-documento" id="legal-contenido"></div>
+    <button type="button" id="btn-legal-cerrar" class="btn-primario">← Volver</button>
+  </section>
+
   <!-- Home -->
   <section id="view-home" class="view">
     <div class="card home-card">
@@ -463,6 +491,7 @@
       <p class="etiqueta">Placa</p>
       <p class="valor" id="home-placa">--</p>
       <button type="button" id="btn-cambiar-conductor" class="btn-link">Cambiar mis datos</button>
+      <p class="legal-enlaces"><a href="#" data-legal="terminos">Términos y condiciones</a> · <a href="#" data-legal="politica">Política de datos personales</a></p>
     </div>
 
     <button type="button" id="btn-iniciar-chequeo" class="btn-accion btn-verde">
@@ -484,6 +513,19 @@
       <span class="btn-accion-icono">🛣️</span>
       <span>Registro de recorrido</span>
     </button>
+
+    <!-- v1.10.2: la Prueba preventiva va dentro de las opciones del conductor permanente -->
+    <div class="card home-prueba">
+      <p class="etiqueta">Prueba preventiva de seguridad vial</p>
+        <div class="bloque-prueba">
+            <p id="tamizaje-estado" class="tamizaje-estado">Verificando tu prueba preventiva…</p>
+            <button type="button" id="btn-iniciar-prueba" class="btn-accion btn-morado hidden">
+              <span class="btn-accion-icono">🚦</span>
+              <span id="tamizaje-boton-texto">Prueba de Biotelemetría en Conducción</span>
+            </button>
+            <p id="tamizaje-aviso-guia" class="aviso-guia hidden">Esta herramienta genera indicadores orientativos para gestión en seguridad vial. No reemplaza la valoración de un profesional de la salud, ni prueba de conducción.</p>
+          </div>
+    </div>
 
     <div id="cola-badge-cont" class="cola-info">
       <span id="cola-badge" class="hidden">0</span>
@@ -723,5 +765,6 @@
 <script src="mod-headsense.js"></script>
 <script src="mod-telemetria.js"></script>
 <script src="mod-tamizaje.js"></script>
+<script src="legal.js"></script>
 </body>
 </html>

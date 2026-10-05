@@ -229,6 +229,7 @@ const TAMIZAJE_CONFIG = {
   // true: si el tamizaje está vigente, el botón de inicio desaparece.
   // false: se muestra igual (útil si el SST quiere repetirlo antes del año).
   OCULTAR_BOTON_SI_VIGENTE: true,
-  // Si la consulta a la hoja tarda más, se decide solo con lo guardado en el celular
-  TIEMPO_MAX_CONSULTA_MS: 6000
+  // Si la consulta a la hoja tarda más, se decide solo con lo guardado en el celular.
+  // Google Apps Script puede tardar 5–10 s en responder la primera vez ("arranque en frío").
+  TIEMPO_MAX_CONSULTA_MS: 15000
 };

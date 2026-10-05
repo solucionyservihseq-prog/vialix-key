@@ -665,6 +665,10 @@ body.en-prueba { overflow: hidden; }
 /* ============================================================
    Parte 4 (v1.9.0): vigencia anual del tamizaje
    ============================================================ */
+/* v1.10.2: la prueba dentro del menú del conductor permanente */
+.home-prueba .bloque-prueba { margin-top: 6px; padding-top: 0; border-top: none; }
+.home-prueba .btn-accion { margin: 10px 0 6px; }
+
 .tamizaje-estado {
   border-radius: 10px;
   padding: 12px 14px;
@@ -702,3 +706,52 @@ body.en-prueba { overflow: hidden; }
   margin: -4px 4px 4px;
 }
 .aviso-legal { font-size: 0.75rem; line-height: 1.4; color: #7A8580; text-align: left; margin-top: 14px; }
+
+/* ============================================================
+   Parte 5 (v1.10.0): Términos, Política de datos y autorizaciones
+   ============================================================ */
+/* v1.10.1: textos legales más cortos y en letra pequeña */
+.legal-casillas { margin: 14px 0 6px; display: flex; flex-direction: column; gap: 8px; }
+.texto-corto { font-size: 0.8rem !important; line-height: 1.4; }
+.legal-casilla {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: var(--gris-bg);
+  border: 1px solid var(--gris-claro);
+  border-radius: 10px;
+  padding: 9px 10px;
+  font-size: 0.74rem;
+  line-height: 1.4;
+  color: #4A5550;
+  text-align: left;
+  cursor: pointer;
+}
+.legal-casilla input { flex: 0 0 20px; width: 20px; height: 20px; margin: 0; accent-color: var(--verde); }
+.legal-casilla em { color: #7A8580; font-style: normal; }
+.legal-casilla a, .legal-enlaces a { color: var(--azul); font-weight: 700; }
+.legal-sensibles { margin: 6px 0 14px; border-color: #D9CBEF; background: #F6F2FC; }
+.legal-error { background: #FCE4E4; color: #9B2C2C; font-weight: 700; font-size: 0.78rem; border-radius: 8px; padding: 10px 12px; text-align: left; }
+.legal-enlaces { font-size: 0.8rem; text-align: center; margin: 12px 0 0; }
+.btn-gigante:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.legal-pestanas { display: flex; gap: 8px; margin-bottom: 12px; }
+.legal-pestana {
+  flex: 1;
+  border: 2px solid var(--verde);
+  background: var(--blanco);
+  color: var(--verde);
+  border-radius: 10px;
+  padding: 10px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+.legal-pestana.activa { background: var(--verde); color: white; }
+.legal-documento { text-align: left; }
+.legal-documento h1 { font-size: 1.25rem; }
+.legal-documento h2 { font-size: 1rem; margin-top: 18px; }
+.legal-documento p, .legal-documento li { font-size: 0.9rem; line-height: 1.55; color: #3D4A44; }
+.legal-documento ul { padding-left: 20px; }
+.legal-meta { font-size: 0.78rem !important; color: #7A8580 !important; }
+.legal-borrador { background: #FFF3CD; border: 2px dashed #C99A00; color: #6B5310 !important; font-weight: 800; border-radius: 8px; padding: 10px 12px; }

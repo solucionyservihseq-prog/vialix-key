@@ -124,6 +124,14 @@ const PruebasComun = (() => {
     await sincronizar();
   }
 
+  // Encola cualquier registro para el backend de PSICOTEST (p. ej. autorizaciones)
+  function encolar(registro) {
+    const cola = leer(CLAVES.COLA);
+    cola.push(registro);
+    escribir(CLAVES.COLA, cola);
+    sincronizar();
+  }
+
   function textoEnvio(id) {
     if (!backendConfigurado()) return { texto: "Guardado solo en este celular (backend sin configurar).", ok: false };
     if (pendiente(id)) return { texto: "Guardado en el celular · se enviará al recuperar conexión.", ok: false };
@@ -138,5 +146,5 @@ const PruebasComun = (() => {
   window.addEventListener("online", sincronizar);
   document.addEventListener("DOMContentLoaded", () => sincronizar());
 
-  return { esc, nuevoId, persona, enCurso, crearResultado, registrar, ultimos, textoEnvio, contarPendientes, sincronizar, listaRecomendaciones };
+  return { esc, nuevoId, persona, enCurso, crearResultado, registrar, encolar, ultimos, textoEnvio, contarPendientes, sincronizar, listaRecomendaciones };
 })();

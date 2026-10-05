@@ -67,7 +67,9 @@ const Tamizaje = (() => {
   const fecha = (d) => d.toLocaleDateString("es-CO", { day: "numeric", month: "long", year: "numeric" });
 
   function textoEstado(e) {
-    const nota = e.verificado ? "" : " (Sin conexión: se revisó solo con este celular.)";
+    const nota = e.verificado ? "" : navigator.onLine
+      ? " (No se pudo consultar el registro en este momento: se revisó solo con este celular.)"
+      : " (Sin conexión: se revisó solo con este celular.)";
     if (e.vigente) {
       return { clase: "ok", texto: `✓ Tu ${T().NOMBRE.toLowerCase()} está al día. Vigente hasta el ${fecha(e.vence)}.${nota}`, boton: null };
     }
