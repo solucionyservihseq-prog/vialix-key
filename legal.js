@@ -19,7 +19,50 @@
    Decisión Andina 351 de 1993 (derechos de autor).
    ============================================================ */
 
-const LEGAL_CONFIG = {
+/* v1.12.0 · Datos legales POR EMPRESA CLIENTE.
+   La empresa se elige con el enlace de la app: ...?empresa=eficacia
+   (queda guardada en el celular; si se instala como app, la recuerda).
+   Sin empresa, se muestra el texto genérico con la marca BORRADOR.
+   Para un cliente nuevo: agrega su bloque a LEGAL_EMPRESAS con los datos
+   de SU política y entrega el enlace con su clave.
+   APROBADO: false → los documentos siguen con la marca BORRADOR hasta que
+   el área de protección de datos del cliente los apruebe. */
+const LEGAL_EMPRESAS = {
+  eficacia: {
+    EMPRESA: "EFICACIA S.A.",
+    VERSION: "EFICACIA-1.0",
+    FECHA_VIGENCIA: "25 de noviembre de 2026",
+    APROBADO: false,
+    RESPONSABLE_NOMBRE: "EFICACIA S.A.",
+    RESPONSABLE_NIT: "800.137.960-7",
+    RESPONSABLE_DIRECCION: "Av. 5N # 23AN-35, barrio San Vicente, Cali, Colombia",
+    CORREO_DATOS: "protecciondedatos@eficacia.com.co",
+    TELEFONO_DATOS: "PBX (602) 485 4242",
+    URL_POLITICA_RESPONSABLE: "https://www.eficacia.com.co",
+    POLITICA_RESPONSABLE_NOMBRE: "Política de Tratamiento de la Información de EFICACIA S.A. (versión 4, vigente desde el 1 de febrero de 2017)",
+    // Procedimiento propio del cliente (art. 19 de su política)
+    NOTA_DERECHOS: "También puede radicar una carta firmada en la oficina principal de EFICACIA S.A. (Av. 5N # 23AN-35, Cali) o en cualquiera de sus sedes, adjuntando copia de su documento de identidad. Si actúa mediante apoderado, debe anexar el poder con reconocimiento de firma ante notario.",
+    SOLO_MAYORES: true,
+    DESTINATARIOS: "el área de Seguridad y Salud en el Trabajo y el equipo del Plan Estratégico de Seguridad Vial de EFICACIA S.A., y la Administradora de Riesgos Laborales a la que usted está afiliado (Seguros Bolívar ARL), que suministra la herramienta y actúa como Encargada del tratamiento, para la gestión de la seguridad vial y la prevención de riesgos laborales"
+  }
+};
+
+const LEGAL_EMPRESA = (() => {
+  let clave = "";
+  try { clave = (new URLSearchParams(location.search).get("empresa") || "").trim().toLowerCase(); } catch (e) { /* sin URL */ }
+  try {
+    if (LEGAL_EMPRESAS[clave]) localStorage.setItem("vialix_empresa", clave);
+    else clave = localStorage.getItem("vialix_empresa") || "";
+  } catch (e) { /* sin almacenamiento */ }
+  return LEGAL_EMPRESAS[clave] ? clave : "";
+})();
+
+const LEGAL_BASE = {
+  EMPRESA: "",
+  APROBADO: false,
+  POLITICA_RESPONSABLE_NOMBRE: "",
+  NOTA_DERECHOS: "",
+  SOLO_MAYORES: false,
   VERSION: "1.0",
   FECHA_VIGENCIA: "POR COMPLETAR (ej. 15 de octubre de 2026)",
 
@@ -36,18 +79,22 @@ const LEGAL_CONFIG = {
   DESTINATARIOS: "la empresa contratante donde laboras y su equipo de Seguridad y Salud en el Trabajo, y la Administradora de Riesgos Laborales (ARL) a la que está afiliada, para la gestión de la seguridad vial y la prevención de riesgos laborales"
 };
 
+const LEGAL_CONFIG = Object.assign({}, LEGAL_BASE, LEGAL_EMPRESAS[LEGAL_EMPRESA] || {});
+
 const ModLegal = (() => {
   const CLAVE = "vialix_consentimiento";
   const C = LEGAL_CONFIG;
   const esc = (t) => String(t == null ? "" : t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  const borrador = () => Object.values(C).some((v) => typeof v === "string" && v.includes("POR COMPLETAR"));
+  const incompleto = () => Object.values(C).some((v) => typeof v === "string" && v.includes("POR COMPLETAR"));
+  const borrador = () => incompleto() || !C.APROBADO;
   let vistaAnterior = "view-inicio";
 
   /* ---------- Textos ---------- */
 
   function encabezado(titulo) {
     return `
-      ${borrador() ? `<p class="legal-borrador">BORRADOR · Documento pendiente de revisión y aprobación jurídica. Los campos "POR COMPLETAR" deben diligenciarse antes de su publicación.</p>` : ""}
+      ${incompleto() ? `<p class="legal-borrador">BORRADOR · Documento pendiente de revisión y aprobación jurídica. Los campos "POR COMPLETAR" deben diligenciarse antes de su publicación.</p>`
+        : borrador() ? `<p class="legal-borrador">BORRADOR · El área de protección de datos de ${esc(C.EMPRESA || C.RESPONSABLE_NOMBRE)} debe aprobar este documento antes de su uso definitivo.</p>` : ""}
       <h1>${titulo}</h1>
       <p class="legal-meta">VIALIX KEY · Versión ${esc(C.VERSION)} · Vigente desde: ${esc(C.FECHA_VIGENCIA)}</p>`;
   }
@@ -105,7 +152,8 @@ const ModLegal = (() => {
 
       <h2>1. Responsable del tratamiento</h2>
       <p><strong>${esc(C.RESPONSABLE_NOMBRE)}</strong> · NIT ${esc(C.RESPONSABLE_NIT)} · ${esc(C.RESPONSABLE_DIRECCION)} · Correo: ${esc(C.CORREO_DATOS)} · Teléfono: ${esc(C.TELEFONO_DATOS)}.</p>
-      ${C.URL_POLITICA_RESPONSABLE ? `<p>Esta política complementa la política general del Responsable, disponible en <a href="${esc(C.URL_POLITICA_RESPONSABLE)}" target="_blank" rel="noopener">${esc(C.URL_POLITICA_RESPONSABLE)}</a>.</p>` : ""}
+      ${C.URL_POLITICA_RESPONSABLE ? `<p>Esta política complementa ${C.POLITICA_RESPONSABLE_NOMBRE ? `la <strong>${esc(C.POLITICA_RESPONSABLE_NOMBRE)}</strong>` : "la política general del Responsable"}, disponible en <a href="${esc(C.URL_POLITICA_RESPONSABLE)}" target="_blank" rel="noopener">${esc(C.URL_POLITICA_RESPONSABLE)}</a>. En lo no previsto aquí se aplica esa política.</p>` : ""}
+      ${C.SOLO_MAYORES ? `<p>Esta política no aplica a menores de edad. Si usted es menor de 18 años, no continúe con el registro.</p>` : ""}
 
       <h2>2. Qué datos recolectamos</h2>
       <ul>
@@ -152,6 +200,7 @@ const ModLegal = (() => {
 
       <h2>7. Cómo ejercer sus derechos</h2>
       <p>Escriba a ${esc(C.CORREO_DATOS)} o llame al ${esc(C.TELEFONO_DATOS)}, indicando su nombre, identificación, la solicitud y un medio de respuesta. Las <strong>consultas</strong> se responden en máximo 10 días hábiles, prorrogables 5 días hábiles más; los <strong>reclamos</strong>, en máximo 15 días hábiles, prorrogables 8 días hábiles más (artículos 14 y 15 de la Ley 1581 de 2012). Puede retirar la autorización de contacto en cualquier momento desde "Editar mis datos" en la aplicación o por estos canales.</p>
+      ${C.NOTA_DERECHOS ? `<p>${esc(C.NOTA_DERECHOS)}</p>` : ""}
 
       <h2>8. Seguridad y conservación</h2>
       <p>Aplicamos medidas técnicas y administrativas razonables para proteger sus datos contra pérdida, consulta o uso no autorizado. Los datos se conservan mientras dure su vinculación con la empresa y por el tiempo que exijan las normas aplicables a la gestión de la seguridad vial y a la seguridad y salud en el trabajo; después se suprimen o anonimizan.</p>

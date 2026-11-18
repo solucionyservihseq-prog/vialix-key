@@ -1,7 +1,7 @@
 // Prefijo propio: solo se borran cachés de VIALIX KEY, nunca los de otras
 // apps publicadas en el mismo dominio github.io (p. ej. VIALIX HEADSENSE).
 const CACHE_PREFIJO = "vialix-key-v";
-const CACHE_NAME = CACHE_PREFIJO + "31";
+const CACHE_NAME = CACHE_PREFIJO + "32";
 const ASSETS = [
   "./",
   "./index.html",
@@ -60,7 +60,7 @@ self.addEventListener("fetch", (event) => {
   }
 
   event.respondWith(
-    caches.match(req).then((cached) => {
+    caches.match(req, req.mode === "navigate" ? { ignoreSearch: true } : undefined).then((cached) => {
       const fetchPromise = fetch(req)
         .then((res) => {
           if (res && res.status === 200) {
