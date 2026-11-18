@@ -142,7 +142,13 @@ const Almacen = (() => {
         body: JSON.stringify(armarPayload(sesion))
       });
       const data = await res.json();
-      if (!data || data.status !== "ok") throw new Error(data && data.mensaje ? data.mensaje : "Respuesta inválida del backend");
+      if (data && data.status === "error" && data.codigo === "datos_invalidos") {
+        sesion.rechazada = true;   // v1.11.0: no se reintenta; queda en el celular para revisión
+        await guardarSesion(sesion);
+        console.warn("El servidor rechazó la sesión por datos inválidos (ref " + data.ref + ")");
+        return false;
+      }
+      if (!data || data.status !== "ok") throw new Error("Respuesta inválida del backend");
       sesion.sincronizada = true;
       sesion.csv_url = data.csv_url || "";
       await guardarSesion(sesion);
@@ -158,7 +164,7 @@ const Almacen = (() => {
     if (sincronizando || !backendConfigurado() || !navigator.onLine) return;
     sincronizando = true;
     try {
-      const pendientes = (await listarSesiones()).filter((s) => !s.sincronizada);
+      const pendientes = (await listarSesiones()).filter((s) => !s.sincronizada && !s.rechazada);
       for (const p of pendientes) {
         const completa = await obtenerSesion(p.id);
         if (completa) await enviarSesion(completa);
@@ -169,7 +175,7 @@ const Almacen = (() => {
   }
 
   async function contarPendientes() {
-    return (await listarSesiones()).filter((s) => !s.sincronizada).length;
+    return (await listarSesiones()).filter((s) => !s.sincronizada && !s.rechazada).length;
   }
 
   return {

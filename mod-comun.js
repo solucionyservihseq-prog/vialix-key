@@ -102,7 +102,10 @@ const PruebasComun = (() => {
           });
           const data = await res.json();
           if (data && data.status === "ok") enviados.add(r.id);
-          else console.warn("El backend rechazó el resultado:", data);
+          else if (data && data.codigo === "datos_invalidos") {
+            enviados.add(r.id);   // reintentarlo no sirve: sale de la cola
+            console.warn("El servidor rechazó el registro por datos inválidos (ref " + data.ref + ")");
+          } else console.warn("El backend no recibió el registro, queda pendiente:", data && data.codigo);
         } catch (err) {
           console.warn("Sin conexión con el backend, queda pendiente:", err);
           break;

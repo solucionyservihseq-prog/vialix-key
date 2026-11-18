@@ -24,6 +24,11 @@ const state = {
 /* ---------- Utilidades ---------- */
 
 function $(sel) { return document.querySelector(sel); }
+
+// v1.11.0: escapa texto antes de insertarlo como HTML (defensa contra XSS)
+function escHTML(t) {
+  return String(t == null ? "" : t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
 function $all(sel) { return Array.from(document.querySelectorAll(sel)); }
 
 function showView(id) {
@@ -66,13 +71,26 @@ function getGeo() {
 
 /* ---------- Envío de datos (con cola offline) ---------- */
 
+// v1.11.0: identificador único por registro (el backend v2 lo usa para no duplicar filas)
+function asegurarId(payload) {
+  if (!payload.id) payload.id = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+  return payload;
+}
+
+// v1.11.0: el backend rechazó el registro por inválido → reintentarlo no sirve
+function rechazadoPorDatos(data) {
+  return !!(data && data.status === "error" && data.codigo === "datos_invalidos");
+}
+
 function queuePending(payload) {
+  asegurarId(payload);
   const queue = JSON.parse(localStorage.getItem(STORAGE_KEYS.QUEUE) || "[]");
   queue.push(payload);
   localStorage.setItem(STORAGE_KEYS.QUEUE, JSON.stringify(queue));
 }
 
 async function sendToBackend(payload) {
+  asegurarId(payload);
   if (!VIALIX_CONFIG.APPS_SCRIPT_URL || VIALIX_CONFIG.APPS_SCRIPT_URL.includes("PEGA_AQUI")) {
     console.warn("APPS_SCRIPT_URL no configurada. Guardando en cola local.");
     queuePending(payload);
@@ -86,6 +104,10 @@ async function sendToBackend(payload) {
     });
     const data = await res.json();
     if (data && data.status === "ok") return { ok: true };
+    if (rechazadoPorDatos(data)) {
+      console.warn("El servidor rechazó el registro por datos inválidos (ref " + data.ref + ")");
+      return { ok: false, rechazado: true };
+    }
     throw new Error("Respuesta inválida del backend");
   } catch (err) {
     console.warn("No se pudo enviar, se guarda en cola local:", err);
@@ -101,6 +123,7 @@ async function reintentarCola() {
 
   const restante = [];
   for (const item of queue) {
+    asegurarId(item);
     try {
       const res = await fetch(VIALIX_CONFIG.APPS_SCRIPT_URL, {
         method: "POST",
@@ -108,12 +131,15 @@ async function reintentarCola() {
         body: JSON.stringify(item)
       });
       const data = await res.json();
-      if (!data || data.status !== "ok") restante.push(item);
+      if (rechazadoPorDatos(data)) console.warn("Registro descartado por datos inválidos (ref " + data.ref + ")");
+      else if (!data || data.status !== "ok") restante.push(item);
     } catch (e) {
       restante.push(item);
     }
   }
-  localStorage.setItem(STORAGE_KEYS.QUEUE, JSON.stringify(restante));
+  // Conservar lo que se haya encolado mientras se enviaba
+  const actual = JSON.parse(localStorage.getItem(STORAGE_KEYS.QUEUE) || "[]");
+  localStorage.setItem(STORAGE_KEYS.QUEUE, JSON.stringify(restante.concat(actual.slice(queue.length))));
   actualizarBadgeCola();
 }
 
@@ -169,10 +195,10 @@ function renderLlamadas(idContenedor) {
     }
     a.addEventListener("click", () => registrarAlertaEmergencia(linea));
     a.innerHTML = `
-      <span class="llamada-icono">${linea.icono || "📞"}</span>
+      <span class="llamada-icono">${escHTML(linea.icono || "📞")}</span>
       <span class="llamada-texto">
-        <strong>${linea.nombre}</strong>
-        <small>${linea.detalle || ""}</small>
+        <strong>${escHTML(linea.nombre)}</strong>
+        <small>${escHTML(linea.detalle || "")}</small>
       </span>
     `;
     cont.appendChild(a);
@@ -505,8 +531,8 @@ function renderCategorias() {
     link.target = "_blank";
     link.rel = "noopener";
     link.innerHTML = `
-      <span class="categoria-icono">${cat.icono || "🚙"}</span>
-      <span>${cat.nombre}</span>
+      <span class="categoria-icono">${escHTML(cat.icono || "🚙")}</span>
+      <span>${escHTML(cat.nombre)}</span>
     `;
     cont.appendChild(link);
   });
@@ -585,7 +611,7 @@ let nivelRiesgoSeleccionado = null;
 function irARiesgoRuta() {
   const sel = $("#riesgo-tipo");
   if (!sel.dataset.listo) {
-    sel.innerHTML = VIALIX_CONFIG.TIPOS_RIESGO_RUTA.map((t) => `<option value="${t}">${t}</option>`).join("");
+    sel.innerHTML = VIALIX_CONFIG.TIPOS_RIESGO_RUTA.map((t) => `<option value="${escHTML(t)}">${escHTML(t)}</option>`).join("");
     sel.dataset.listo = "1";
   }
   $("#riesgo-placa").value = state.placa || "";
