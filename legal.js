@@ -1,15 +1,11 @@
 /* ============================================================
-   VIALIX KEY v1.10.0 - Términos y condiciones, Política de
+   VIALIX KEY v1.12.1 - Términos y condiciones, Política de
    tratamiento de datos personales y autorizaciones
    ------------------------------------------------------------
-   BORRADOR PARA REVISIÓN JURÍDICA. Antes de publicar:
-   1. Completa LEGAL_CONFIG con los datos del Responsable del
-      tratamiento (lo define el área jurídica: ARL, empleador o ambos).
-   2. Pide al área jurídica que revise y apruebe los textos.
-   3. Cada vez que cambien los textos, sube VERSION: la app pedirá
-      aceptarlos de nuevo a todos los conductores.
-   Mientras haya campos "POR COMPLETAR", los documentos se muestran
-   con la marca BORRADOR.
+   VERSIÓN FINAL para EFICACIA S.A.: textos aprobados por su área de
+   protección de datos (noviembre de 2026).
+   Cada vez que cambien los textos, sube VERSION: la app pedirá
+   aceptarlos de nuevo a todos los conductores.
 
    Marco de referencia: Constitución Política art. 15 (habeas data),
    Ley 1581 de 2012 y Decreto 1377 de 2013 (compilado en el Decreto
@@ -19,20 +15,20 @@
    Decisión Andina 351 de 1993 (derechos de autor).
    ============================================================ */
 
-/* v1.12.0 · Datos legales POR EMPRESA CLIENTE.
+/* Datos legales POR EMPRESA CLIENTE.
    La empresa se elige con el enlace de la app: ...?empresa=eficacia
    (queda guardada en el celular; si se instala como app, la recuerda).
-   Sin empresa, se muestra el texto genérico con la marca BORRADOR.
+   v1.12.1: sin enlace de empresa se usa EMPRESA_POR_DEFECTO (eficacia,
+   único cliente aprobado), así nadie ve textos de borrador.
    Para un cliente nuevo: agrega su bloque a LEGAL_EMPRESAS con los datos
-   de SU política y entrega el enlace con su clave.
-   APROBADO: false → los documentos siguen con la marca BORRADOR hasta que
-   el área de protección de datos del cliente los apruebe. */
+   de SU política, con APROBADO: false hasta que su área de protección de
+   datos lo apruebe, y entrega el enlace con su clave. */
 const LEGAL_EMPRESAS = {
   eficacia: {
     EMPRESA: "EFICACIA S.A.",
     VERSION: "EFICACIA-1.0",
     FECHA_VIGENCIA: "25 de noviembre de 2026",
-    APROBADO: false,
+    APROBADO: true,   // aprobado por protección de datos de EFICACIA S.A. (nov. 2026)
     RESPONSABLE_NOMBRE: "EFICACIA S.A.",
     RESPONSABLE_NIT: "800.137.960-7",
     RESPONSABLE_DIRECCION: "Av. 5N # 23AN-35, barrio San Vicente, Cali, Colombia",
@@ -47,6 +43,8 @@ const LEGAL_EMPRESAS = {
   }
 };
 
+const EMPRESA_POR_DEFECTO = "eficacia";
+
 const LEGAL_EMPRESA = (() => {
   let clave = "";
   try { clave = (new URLSearchParams(location.search).get("empresa") || "").trim().toLowerCase(); } catch (e) { /* sin URL */ }
@@ -54,7 +52,7 @@ const LEGAL_EMPRESA = (() => {
     if (LEGAL_EMPRESAS[clave]) localStorage.setItem("vialix_empresa", clave);
     else clave = localStorage.getItem("vialix_empresa") || "";
   } catch (e) { /* sin almacenamiento */ }
-  return LEGAL_EMPRESAS[clave] ? clave : "";
+  return LEGAL_EMPRESAS[clave] ? clave : EMPRESA_POR_DEFECTO;
 })();
 
 const LEGAL_BASE = {
